@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;
+       margin:0;padding:20px;}
+  .box{background:white;border-radius:16px;padding:30px;
+       max-width:560px;margin:0 auto;
+       box-shadow:0 4px 20px rgba(0,0,0,0.1);}
+  h2{color:#6a1b9a;margin-bottom:6px;}
+  #prog{color:#9e9e9e;font-size:0.85rem;margin-bottom:20px;}
+  #q{font-size:1.05rem;font-weight:600;padding:16px;
+     background:#f3e5f5;border-radius:10px;
+     border-left:4px solid #6a1b9a;margin-bottom:20px;}
+  .opts{display:flex;flex-direction:column;gap:10px;}
+  .opt{padding:13px 18px;border:2px solid #ce93d8;border-radius:10px;
+       background:white;cursor:pointer;font-size:0.95rem;
+       text-align:left;transition:all 0.2s;}
+  .opt:hover{background:#f3e5f5;}
+  .opt.correct{background:#c8e6c9;border-color:#2e7d32;color:#1b5e20;}
+  .opt.wrong{background:#ffcdd2;border-color:#c62828;color:#b71c1c;}
+  #fb{margin-top:14px;font-size:1rem;font-weight:600;min-height:24px;}
+  #sc{color:#757575;margin-top:10px;}
+  #done{display:none;text-align:center;padding:20px;}
+  #done h3{color:#6a1b9a;}
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>Grammar Quiz</h2>
+  <div id="prog"></div>
+  <div id="q"></div>
+  <div class="opts" id="opts"></div>
+  <div id="fb"></div>
+  <div id="sc">Score: 0 / 0</div>
+  <div id="done"><h3>🎉 Quiz Complete!</h3><p id="final"></p>
+    <button onclick="restart()"
+            style="background:#6a1b9a;color:white;border:none;
+                   padding:12px 28px;border-radius:10px;cursor:pointer;
+                   font-size:1rem;">Play Again</button>
+  </div>
+</div>
+<script>
+const qs=[
+  {q:'Which word is a noun in: "The dog runs fast"?',o:['The','dog','runs','fast'],a:1},
+  {q:'Choose the correct tense: "Yesterday, she ___ to school."',o:['go','goes','went','going'],a:2},
+  {q:'Which is a proper noun?',o:['city','river','Abuja','school'],a:2},
+  {q:'"She sings beautifully." What part of speech is "beautifully"?',o:['Noun','Verb','Adjective','Adverb'],a:3},
+  {q:'Which sentence has correct punctuation?',o:["let's go now","Let's go now.","lets go now?","Lets go now"],a:1},
+  {q:'Choose the plural of "child":',o:['childs','childrens','children','child'],a:2},
+  {q:'The opposite of "ancient" is:',o:['old','modern','big','slow'],a:1},
+  {q:'"He is taller ___ his brother." Fill in:',o:['then','than','as','like'],a:1},
+  {q:'Which word is an adjective?',o:['quickly','run','beautiful','sing'],a:2},
+  {q:'The subject in "Birds fly high" is:',o:['fly','high','Birds','all'],a:2},
+  {q:'Which is a conjunction?',o:['quickly','and','Abuja','run'],a:1},
+  {q:'"I will go to school tomorrow." This is ___ tense.',o:['Past','Present','Future','Perfect'],a:2},
+];
+let idx=0,score=0,total=0;
+function show(){
+  if(idx>=qs.length){
+    document.getElementById('q').style.display='none';
+    document.getElementById('opts').style.display='none';
+    document.getElementById('fb').style.display='none';
+    document.getElementById('done').style.display='block';
+    document.getElementById('final').textContent=
+      'You scored '+score+' out of '+total+' questions.';
+    return;
+  }
+  const q=qs[idx];
+  document.getElementById('prog').textContent=
+    'Question '+(idx+1)+' of '+qs.length;
+  document.getElementById('q').textContent=q.q;
+  document.getElementById('fb').textContent='';
+  const el=document.getElementById('opts');
+  el.innerHTML='';
+  q.o.forEach((o,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opt';
+    btn.textContent=['A','B','C','D'][i]+'. '+o;
+    btn.onclick=()=>pick(i);
+    el.appendChild(btn);
+  });
+}
+function pick(i){
+  total++;
+  const q=qs[idx];
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=null);
+  if(i===q.a){
+    score++;
+    document.querySelectorAll('.opt')[i].classList.add('correct');
+    document.getElementById('fb').innerHTML=
+      '<span style="color:#2e7d32">✓ Correct!</span>';
+  } else {
+    document.querySelectorAll('.opt')[i].classList.add('wrong');
+    document.querySelectorAll('.opt')[q.a].classList.add('correct');
+    document.getElementById('fb').innerHTML=
+      '<span style="color:#c62828">✗ Wrong!</span>';
+  }
+  document.getElementById('sc').textContent='Score: '+score+' / '+total;
+  idx++;setTimeout(show,1500);
+}
+function restart(){
+  idx=0;score=0;total=0;
+  document.getElementById('q').style.display='';
+  document.getElementById('opts').style.display='';
+  document.getElementById('fb').style.display='';
+  document.getElementById('done').style.display='none';
+  show();
+}
+show();
+</script>
+</body>
+</html>

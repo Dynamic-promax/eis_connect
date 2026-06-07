@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}Upload Video{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-2">
+    <div class="col-md-7">
+        <div class="card p-4">
+            <h5 class="fw-bold mb-1">Upload Class Video</h5>
+            <p class="text-muted mb-4">
+                You can upload a video file (MP4, WebM, MKV) or paste a YouTube/Google Drive link.
+            </p>
+
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            {% if session_term %}
+            <div class="alert alert-info py-2">
+                Active Term: <strong>{{ session_term }}</strong>
+            </div>
+            {% else %}
+            <div class="alert alert-warning py-2">No active term. Ask admin to set one.</div>
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Subject</label>
+                        <select name="subject_id" class="form-select" required>
+                            <option value="">Select subject</option>
+                            {% for subject in subjects %}
+                            <option value="{{ subject.id }}">
+                                {{ subject.name }} — {{ subject.school_class.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Class</label>
+                        <select name="class_id" class="form-select" required>
+                            <option value="">Select class</option>
+                            {% for c in classes %}
+                            <option value="{{ c.id }}">{{ c.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label fw-semibold">Video Title</label>
+                        <input type="text" name="title" class="form-control"
+                               placeholder="e.g. Introduction to Photosynthesis" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Week</label>
+                        <input type="text" name="week" class="form-control"
+                               placeholder="e.g. Week 3" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Description (optional)</label>
+                        <textarea name="description" class="form-control" rows="2"
+                                  placeholder="Brief description of this video"></textarea>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="card p-3" style="border:2px dashed var(--border) !important;
+                             box-shadow:none !important;">
+                            <p class="fw-semibold mb-3">Choose one option:</p>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    Option 1 — Upload Video File
+                                </label>
+                                <input type="file" name="video_file" class="form-control"
+                                       accept=".mp4,.webm,.mkv,.avi,.mov">
+                                <small class="text-muted">
+                                    Max recommended size: 500MB. Formats: MP4, WebM, MKV, AVI, MOV.
+                                </small>
+                            </div>
+                            <div class="text-center text-muted my-2">— OR —</div>
+                            <div>
+                                <label class="form-label fw-semibold">
+                                    Option 2 — Paste Video URL
+                                </label>
+                                <input type="url" name="video_url" class="form-control"
+                                       placeholder="https://www.youtube.com/watch?v=...">
+                                <small class="text-muted">
+                                    Paste a YouTube, Google Drive, or any direct video link.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn text-white px-4"
+                                style="background-color:#1a237e;">
+                            <i class="bi bi-cloud-upload me-1"></i> Upload Video
+                        </button>
+                        <a href="{% url 'video_list' %}"
+                           class="btn btn-outline-secondary ms-2">Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

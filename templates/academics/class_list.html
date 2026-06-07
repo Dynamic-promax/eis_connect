@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Classes{% endblock %}
+{% block content %}
+<div class="mt-4 px-3">
+    <h5 class="fw-bold mb-4">Classes by Section</h5>
+    {% for section in sections %}
+    <div class="card mb-3 p-3">
+        <h6 class="fw-bold text-uppercase" style="color:#1a237e;">{{ section.name }}</h6>
+        <div class="d-flex flex-wrap gap-2 mt-2">
+            {% for cls in section.classes.all %}
+            <span class="badge fs-6 bg-light text-dark border">{{ cls.name }}</span>
+            {% empty %}
+            <span class="text-muted">No classes in this section.</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-muted">No sections found. Add sections from the admin panel.</p>
+    {% endfor %}
+</div>
+{% endblock %}

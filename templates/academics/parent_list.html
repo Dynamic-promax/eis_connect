@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Parents{% endblock %}
+{% block content %}
+<div class="mt-4 px-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold">Parents / Guardians</h5>
+        <a href="{% url 'add_parent' %}" class="btn text-white"
+           style="background-color:#1a237e;">+ Add Parent</a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead style="background-color:#1a237e; color:white;">
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Phone (Username)</th>
+                        <th>Children</th>
+                        <th>Account Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for parent in parents %}
+                    <tr>
+                        <td>{{ parent.user.get_full_name }}</td>
+                        <td>{{ parent.phone }}</td>
+                        <td>
+                            {% for child in parent.children.all %}
+                            <span class="badge bg-light text-dark border">
+                                {{ child.get_full_name }}
+                            </span>
+                            {% empty %}
+                            <span class="text-muted">No child linked</span>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% if parent.user.has_usable_password %}
+                            <span class="badge bg-success">Password Set</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">Awaiting First Login</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">
+                            No parents added yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

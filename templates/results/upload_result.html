@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}Upload Result{% endblock %}
+{% block content %}
+<div class="mt-4 px-3">
+    <h5 class="fw-bold mb-3">Upload Student Scores</h5>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if session_term %}
+    <div class="alert alert-info">
+        Active Term: <strong>{{ session_term }}</strong>
+    </div>
+    {% else %}
+    <div class="alert alert-warning">No active session/term. Ask admin to set one.</div>
+    {% endif %}
+
+    <div class="card p-3 mb-4">
+        <form method="GET">
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <label class="form-label fw-semibold">Select Subject</label>
+                    <select name="subject_id" class="form-select" required>
+                        <option value="">Choose subject</option>
+                        {% for subject in subjects %}
+                        <option value="{{ subject.id }}"
+                            {% if selected_subject and selected_subject.id == subject.id %}selected{% endif %}>
+                            {{ subject.name }} — {{ subject.school_class.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label fw-semibold">Select Class</label>
+                    <select name="class_id" class="form-select" required>
+                        <option value="">Choose class</option>
+                        {% for subject in subjects %}
+                        <option value="{{ subject.school_class.id }}"
+                            {% if selected_class and selected_class.id == subject.school_class.id %}selected{% endif %}>
+                            {{ subject.school_class.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn text-white w-100" style="background-color:#1a237e;">
+                        Load Students
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% if students %}
+    <div class="card p-3">
+        <h6 class="fw-bold mb-3">
+            Scores for {{ selected_subject.name }} — {{ selected_class.name }}
+            <small class="text-muted">(CA max: 40 | Exam max: 60)</small>
+        </h6>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="subject_id" value="{{ selected_subject.id }}">
+            <input type="hidden" name="class_id" value="{{ selected_class.id }}">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead style="background-color:#1a237e; color:white;">
+                        <tr>
+                            <th>Adm. No.</th>
+                            <th>Student Name</th>
+                            <th>CA Score (max 40)</th>
+                            <th>Exam Score (max 60)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td>{{ student.admission_number }}</td>
+                            <td>{{ student.get_full_name }}</td>
+                            <td>
+                                <input type="number" name="ca_{{ student.id }}"
+                                    class="form-control form-control-sm"
+                                    min="0" max="40" step="0.5" required>
+                            </td>
+                            <td>
+                                <input type="number" name="exam_{{ student.id }}"
+                                    class="form-control form-control-sm"
+                                    min="0" max="60" step="0.5" required>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn text-white px-4" style="background-color:#1a237e;">
+                Submit Scores
+            </button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

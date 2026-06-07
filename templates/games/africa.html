@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;margin:0;padding:20px;}
+  .box{background:white;border-radius:16px;padding:30px;
+       max-width:560px;margin:0 auto;box-shadow:0 4px 20px rgba(0,0,0,0.1);}
+  h2{color:#bf360c;}
+  #q{font-size:1.05rem;font-weight:600;padding:16px;background:#fbe9e7;
+     border-radius:10px;border-left:4px solid #bf360c;margin-bottom:20px;}
+  .opts{display:flex;flex-direction:column;gap:10px;}
+  .opt{padding:13px 18px;border:2px solid #ffab91;border-radius:10px;
+       background:white;cursor:pointer;font-size:0.95rem;text-align:left;transition:all 0.2s;}
+  .opt:hover{background:#fbe9e7;}
+  .opt.correct{background:#c8e6c9;border-color:#2e7d32;color:#1b5e20;}
+  .opt.wrong{background:#ffcdd2;border-color:#c62828;color:#b71c1c;}
+  #sc{color:#757575;margin-top:14px;}
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>🌍 African Countries Quiz</h2>
+  <div id="q"></div>
+  <div class="opts" id="opts"></div>
+  <div id="sc">Score: 0 / 0</div>
+</div>
+<script>
+const qs=[
+  {q:'What is the capital of Nigeria?',o:['Lagos','Abuja','Kano','Ibadan'],a:1},
+  {q:'Which is the largest country in Africa by area?',o:['Nigeria','Sudan','Algeria','Congo'],a:2},
+  {q:'What is the capital of South Africa?',o:['Johannesburg','Cape Town','Pretoria','Durban'],a:2},
+  {q:'The Nile River flows through which country?',o:['Nigeria','Kenya','Egypt','Ethiopia'],a:2},
+  {q:'What is the capital of Kenya?',o:['Mombasa','Nairobi','Kampala','Dar es Salaam'],a:1},
+  {q:'Which country is known as the "Rainbow Nation"?',o:['Nigeria','Ghana','South Africa','Ethiopia'],a:2},
+  {q:'What is the capital of Ghana?',o:['Kumasi','Accra','Tamale','Cape Coast'],a:1},
+  {q:'Mount Kilimanjaro is in which country?',o:['Kenya','Uganda','Tanzania','Rwanda'],a:2},
+  {q:'What is the capital of Egypt?',o:['Alexandria','Luxor','Giza','Cairo'],a:3},
+  {q:'Which African country was never colonised?',o:['Ghana','Nigeria','Ethiopia','Senegal'],a:2},
+  {q:'What is the capital of Senegal?',o:['Dakar','Abidjan','Bamako','Conakry'],a:0},
+  {q:'The Sahara Desert is the largest in:',o:['Asia','South America','Africa','Australia'],a:2},
+];
+let idx=0,score=0,total=0;
+function show(){
+  if(idx>=qs.length){
+    document.getElementById('q').textContent='🎉 Quiz Complete! Score: '+score+'/'+total;
+    document.getElementById('opts').innerHTML='';
+    return;
+  }
+  const q=qs[idx];
+  document.getElementById('q').textContent='Q'+(idx+1)+': '+q.q;
+  const el=document.getElementById('opts');el.innerHTML='';
+  q.o.forEach((o,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opt';
+    btn.textContent=['A','B','C','D'][i]+'. '+o;
+    btn.onclick=()=>{
+      total++;
+      document.querySelectorAll('.opt').forEach(b=>b.onclick=null);
+      if(i===q.a){score++;btn.classList.add('correct');}
+      else{btn.classList.add('wrong');
+        document.querySelectorAll('.opt')[q.a].classList.add('correct');}
+      document.getElementById('sc').textContent='Score: '+score+' / '+total;
+      idx++;setTimeout(show,1400);
+    };
+    el.appendChild(btn);
+  });
+}
+show();
+</script>
+</body>
+</html>

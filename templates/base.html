@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EIS Connect{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --eis-blue: #1a237e;
+            --eis-blue-light: #e8eaf6;
+            --eis-accent: #ffd600;
+            --sidebar-width: 260px;
+            --topbar-height: 58px;
+            --ticker-height: 36px;
+            --bg: #f0f2f5;
+            --surface: #ffffff;
+            --border: #e0e0e0;
+            --text-main: #212121;
+            --text-muted: #757575;
+            --sidebar-link: #424242;
+            --sidebar-hover-bg: #e8eaf6;
+            --sidebar-hover-text: #1a237e;
+            --table-head-bg: #1a237e;
+            --input-bg: #ffffff;
+            --input-border: #ced4da;
+            --input-text: #212121;
+            --card-shadow: 0 1px 6px rgba(0,0,0,0.07);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --border: #2a2d3a;
+            --text-main: #e0e0e0;
+            --text-muted: #9e9e9e;
+            --sidebar-link: #bdbdbd;
+            --sidebar-hover-bg: #1e2235;
+            --sidebar-hover-text: #90caf9;
+            --table-head-bg: #0d1433;
+            --input-bg: #1e2235;
+            --input-border: #3a3f55;
+            --input-text: #e0e0e0;
+            --card-shadow: 0 1px 8px rgba(0,0,0,0.4);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text-main);
+            font-family: 'Segoe UI', sans-serif;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* ── TICKER ── */
+        .ticker-wrap {
+            width: 100%;
+            background: var(--eis-accent);
+            height: var(--ticker-height);
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1100;
+            border-bottom: 2px solid #f9a825;
+        }
+
+        [data-theme="dark"] .ticker-wrap {
+            background: #1a1a00;
+            border-bottom-color: #333300;
+        }
+
+        [data-theme="dark"] .ticker-item { color: var(--eis-accent); }
+
+        .ticker-label {
+            background: var(--eis-blue);
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0 14px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .ticker-content { display: flex; overflow: hidden; flex: 1; }
+
+        .ticker-items {
+            display: flex;
+            animation: ticker-scroll 35s linear infinite;
+            white-space: nowrap;
+        }
+
+        .ticker-items:hover { animation-play-state: paused; }
+
+        .ticker-item {
+            padding: 0 40px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #1a237e;
+        }
+
+        .ticker-item::before { content: '📢'; margin-right: 6px; }
+
+        @keyframes ticker-scroll {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            position: fixed;
+            top: var(--ticker-height);
+            left: 0;
+            right: 0;
+            height: var(--topbar-height);
+            background: var(--eis-blue);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        }
+
+        [data-theme="dark"] .topbar { background: #0d1433; }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .topbar-brand span { font-size: 1.5rem; }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-chip {
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 5px 14px;
+            color: white;
+            font-size: 0.83rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .role-badge {
+            background: var(--eis-accent);
+            color: var(--eis-blue);
+            font-size: 0.67rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            text-transform: uppercase;
+        }
+
+        .topbar-btn {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: white;
+            border-radius: 8px;
+            padding: 6px 14px;
+            font-size: 0.82rem;
+            text-decoration: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+
+        .topbar-btn:hover {
+            background: rgba(255,255,255,0.25);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            position: fixed;
+            top: calc(var(--ticker-height) + var(--topbar-height));
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--ticker-height) - var(--topbar-height));
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            z-index: 900;
+            padding-bottom: 30px;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .nav-group { border-bottom: 1px solid var(--border); }
+
+        .nav-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 18px;
+            cursor: pointer;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--text-muted);
+            user-select: none;
+            transition: background 0.15s;
+        }
+
+        .nav-group-header:hover { background: var(--sidebar-hover-bg); }
+
+        .nav-group-header .arrow {
+            font-size: 0.7rem;
+            transition: transform 0.25s;
+        }
+
+        .nav-group-header.open .arrow { transform: rotate(180deg); }
+
+        .nav-group-body {
+            display: none;
+            padding: 4px 0 8px;
+            background: var(--bg);
+            transition: background 0.3s;
+        }
+
+        .nav-group-body.show { display: block; }
+
+        .sidebar a.nav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 22px;
+            color: var(--sidebar-link);
+            text-decoration: none;
+            font-size: 0.88rem;
+            border-left: 3px solid transparent;
+            transition: all 0.15s;
+        }
+
+        .sidebar a.nav-link-item:hover,
+        .sidebar a.nav-link-item.active {
+            background: var(--sidebar-hover-bg);
+            color: var(--sidebar-hover-text);
+            border-left-color: var(--eis-blue);
+            font-weight: 600;
+        }
+
+        [data-theme="dark"] .sidebar a.nav-link-item.active {
+            border-left-color: #90caf9;
+        }
+
+        .sidebar a.nav-link-item i { width: 18px; text-align: center; font-size: 0.95rem; }
+
+        .soon-tag {
+            font-size: 0.65rem;
+            background: var(--border);
+            color: var(--text-muted);
+            padding: 1px 6px;
+            border-radius: 8px;
+            margin-left: auto;
+        }
+
+        /* ── MAIN CONTENT ── */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding-top: calc(var(--ticker-height) + var(--topbar-height) + 28px);
+            padding-left: 32px;
+            padding-right: 32px;
+            padding-bottom: 40px;
+            min-height: 100vh;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        /* ── CARDS ── */
+        .card {
+            background: var(--surface) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            color: var(--text-main);
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border-left: 4px solid var(--eis-blue);
+            box-shadow: var(--card-shadow);
+            transition: transform 0.15s, background 0.3s;
+        }
+
+        .stat-card:hover { transform: translateY(-2px); }
+        .stat-card .s-number { font-size: 2rem; font-weight: 700; color: var(--eis-blue); }
+        .stat-card .s-label { color: var(--text-muted); font-size: 0.85rem; margin-top: 2px; }
+        [data-theme="dark"] .stat-card .s-number { color: #90caf9; }
+
+        /* ── TABLES ── */
+        .table { color: var(--text-main); }
+        .table thead th { background: var(--table-head-bg) !important; color: white; }
+        .table tbody tr { border-color: var(--border); }
+        [data-theme="dark"] .table tbody tr:hover td { background: #1e2235; }
+
+        /* ── FORMS ── */
+        .form-control, .form-select {
+            background: var(--input-bg) !important;
+            border-color: var(--input-border) !important;
+            color: var(--input-text) !important;
+        }
+
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 0.2rem rgba(26,35,126,0.25);
+        }
+
+        [data-theme="dark"] .form-control::placeholder { color: #616161; }
+
+        /* ── ALERTS ── */
+        [data-theme="dark"] .alert-info    { background:#0d2033; border-color:#1565c0; color:#90caf9; }
+        [data-theme="dark"] .alert-warning { background:#2a1f00; border-color:#f57f17; color:#ffd54f; }
+        [data-theme="dark"] .alert-success { background:#0a2a0a; border-color:#2e7d32; color:#a5d6a7; }
+        [data-theme="dark"] .alert-danger  { background:#2a0a0a; border-color:#c62828; color:#ef9a9a; }
+
+        /* ── MISC ── */
+        [data-theme="dark"] .badge.bg-light { background:#2a2d3a !important; color:#bdbdbd !important; }
+        .text-muted { color: var(--text-muted) !important; }
+
+        [data-theme="dark"] .btn-outline-secondary { color:#9e9e9e; border-color:#3a3f55; }
+        [data-theme="dark"] .btn-outline-secondary:hover { background:#2a2d3a; color:#e0e0e0; }
+
+        /* ── LOGIN PAGE ── */
+        .login-wrap {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+        }
+    </style>
+</head>
+<body {% if dark_mode %}data-theme="dark"{% endif %}>
+
+
+
+<!-- ══ TICKER ══════════════════════════════════════════════════════════════ -->
+<div class="ticker-wrap">
+    <div class="ticker-label">📢 Announcements</div>
+    <div class="ticker-content">
+        <div class="ticker-items">
+            {% for ann in ticker_announcements %}
+            <span class="ticker-item">{{ ann.title }}: {{ ann.message|truncatechars:80 }}</span>
+            {% empty %}
+            <span class="ticker-item">Welcome to EIS Connect — Essence International School Portal</span>
+            {% endfor %}
+            {% for ann in ticker_announcements %}
+            <span class="ticker-item">{{ ann.title }}: {{ ann.message|truncatechars:80 }}</span>
+            {% empty %}
+            <span class="ticker-item">Welcome to EIS Connect — Essence International School Portal</span>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- ══ TOPBAR ══════════════════════════════════════════════════════════════ -->
+<div class="topbar">
+    <a href="#" class="topbar-brand">
+        <span>🏫</span>
+        <div>
+            <div>EIS Connect</div>
+            <div style="font-size:0.68rem; font-weight:400; opacity:0.8;">
+                Essence International School
+            </div>
+        </div>
+    </a>
+    <div class="topbar-right">
+        <div class="user-chip">
+            <i class="bi bi-person-circle"></i>
+            {{ user.get_full_name|upper }}
+            <span class="role-badge">{{ user.profile.role }}</span>
+        </div>
+        <a href="{% url 'toggle_dark_mode' %}" class="topbar-btn"
+           title="{% if dark_mode %}Light Mode{% else %}Dark Mode{% endif %}">
+            {% if dark_mode %}
+            <i class="bi bi-sun-fill"></i>
+            <span style="font-size:0.8rem;">Light</span>
+            {% else %}
+            <i class="bi bi-moon-fill"></i>
+            <span style="font-size:0.8rem;">Dark</span>
+            {% endif %}
+        </a>
+        <a href="{% url 'logout' %}" class="topbar-btn">
+            <i class="bi bi-box-arrow-right"></i>
+            <span style="font-size:0.8rem;">Logout</span>
+        </a>
+    </div>
+</div>
+
+<!-- ══ SIDEBAR ═════════════════════════════════════════════════════════════ -->
+<div class="sidebar">
+    {% with role=user.profile.role %}
+
+    {% if role == 'admin' or role == 'accountant' %}
+
+        <div class="nav-group">
+            <div class="nav-group-header open" onclick="toggleGroup(this)">
+                <span><i class="bi bi-grid me-2"></i>Overview</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <div class="nav-group-body show">
+                <a href="{% url 'admin_dashboard' %}" class="nav-link-item">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-header open" onclick="toggleGroup(this)">
+                <span><i class="bi bi-mortarboard me-2"></i>Academics</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <div class="nav-group-body show">
+                <a href="{% url 'student_list' %}" class="nav-link-item">
+                    <i class="bi bi-people"></i> Students
+                </a>
+                <a href="{% url 'add_student' %}" class="nav-link-item">
+                    <i class="bi bi-person-plus"></i> Add Student
+                </a>
+                <a href="{% url 'teacher_list' %}" class="nav-link-item">
+                    <i class="bi bi-person-badge"></i> Teachers
+                </a>
+                <a href="{% url 'add_teacher' %}" class="nav-link-item">
+                    <i class="bi bi-person-plus"></i> Add Teacher
+                </a>
+                <a href="{% url 'parent_list' %}" class="nav-link-item">
+                    <i class="bi bi-person-heart"></i> Parents
+                </a>
+                <a href="{% url 'add_parent' %}" class="nav-link-item">
+                    <i class="bi bi-person-plus"></i> Add Parent
+                </a>
+                <a href="{% url 'class_list' %}" class="nav-link-item">
+                    <i class="bi bi-building"></i> Classes
+                </a>
+                <a href="{% url 'subject_list' %}" class="nav-link-item">
+                    <i class="bi bi-book"></i> Subjects
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-header open" onclick="toggleGroup(this)">
+                <span><i class="bi bi-card-checklist me-2"></i>Results</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <div class="nav-group-body show">
+                <a href="{% url 'pending_results' %}" class="nav-link-item">
+                    <i class="bi bi-hourglass-split"></i> Pending Results
+                </a>
+                <a href="{% url 'view_result' %}" class="nav-link-item">
+                    <i class="bi bi-eye"></i> View Results
+                </a>
+                <a href="{% url 'class_result_sheet' %}" class="nav-link-item">
+                    <i class="bi bi-table"></i> Class Result Sheet
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-header open" onclick="toggleGroup(this)">
+                <span><i class="bi bi-journals me-2"></i>Learning</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <div class="nav-group-body show">
+                <a href="{% url 'note_list' %}" class="nav-link-item">
+                    <i class="bi bi-file-earmark-text"></i> Notes
+                </a>
+                <a href="{% url 'assignment_list' %}" class="nav-link-item">
+                    <i class="bi bi-clipboard-check"></i> Assignments
+                </a>
+                <a href="{% url 'video_list' %}" class="nav-link-item">
+                    <i class="bi bi-camera-video"></i> Class Videos
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-header open" onclick="toggleGroup(this)">
+                <span><i class="bi bi-megaphone me-2"></i>Communication</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <div class="nav-group-body show">
+                <a href="{% url 'announcement_list' %}" class="nav-link-item">
+                    <i class="bi bi-bell"></i> Announcements
+                </a>
+                <a href="{% url 'create_announcement' %}" class="nav-link-item">
+                    <i class="bi bi-plus-circle"></i> Post Announcement
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-header" onclick="toggleGroup(this)">
+                <span><i class="bi bi-cash-stack me-2"></i>Finance</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <div class="nav-group-body">
+                <a href="#" class="nav-link-item">
+                    <i class="bi bi-receipt"></i> Fee Records
+                    <span class="soon-tag">Soon</span>
+                </a>
+            </div>
+        </div>
+
+    {% elif role == 'teacher' %}
+
+        <div class="nav-group">
+            <div class="nav-group-header open" onclick="toggleGroup(this)">
+                <span><i class="bi bi-grid me-2"></i>Overview</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <div class="nav-group-body show">
+                <a href="{% url 'teacher_dashboard' %}" class="nav-link-item">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-header open" onclick="toggleGroup(this)">
+                <span><i class="bi bi-card-checklist me-2"></i>Results</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <div class="nav-group-body show">
+                <a href="{% url 'upload_result' %}" class="nav-link-item">
+                    <i class="bi bi-upload"></i> Upload Scores
+                </a>
+                <a href="{% url 'view_result' %}" class="nav-link-item">
+                    <i class="bi bi-eye"></i> View Results
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-header open" onclick="toggleGroup(this)">
+                <span><i class="bi bi-journals me-2"></i>Learning</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <div class="nav-group-body show">
+                <a href="{% url 'note_list' %}" class="nav-link-item">
+                    <i class="bi bi-file-earmark-text"></i> Notes
+                </a>
+                <a href="{% url 'upload_note' %}" class="nav-link-item">
+                    <i class="bi bi-cloud-upload"></i> Upload Note
+                </a>
+                <a href="{% url 'assignment_list' %}" class="nav-link-item">
+                    <i class="bi bi-clipboard-check"></i> Assignments
+                </a>
+                <a href="{% url 'upload_assignment' %}" class="nav-link-item">
+                    <i class="bi bi-cloud-upload"></i> Upload Assignment
+                </a>
+                <a href="{% url 'video_list' %}" class="nav-link-item">
+                    <i class="bi bi-camera-video"></i> Videos
+                </a>
+                <a href="{% url 'upload_video' %}" class="nav-link-item">
+                    <i class="bi bi-cloud-upload"></i> Upload Video
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-header open" onclick="toggleGroup(this)">
+                <span><i class="bi bi-people me-2"></i>My Students</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <div class="nav-group-body show">
+                <a href="{% url 'student_list' %}" class="nav-link-item">
+                    <i class="bi bi-people"></i> View Students
+                </a>
+                <a href="{% url 'add_parent' %}" class="nav-link-item">
+                    <i class="bi bi-person-heart"></i> Add Parent
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-header open" onclick="toggleGroup(this)">
+                <span><i class="bi bi-megaphone me-2"></i>Communication</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <div class="nav-group-body show">
+                <a href="{% url 'announcement_list' %}" class="nav-link-item">
+                    <i class="bi bi-bell"></i> Announcements
+                </a>
+            </div>
+        </div>
+
+    {% elif role == 'parent' %}
+
+        <div class="nav-group">
+            <div class="nav-group-header open" onclick="toggleGroup(this)">
+                <span><i class="bi bi-grid me-2"></i>Overview</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <div class="nav-group-body show">
+                <a href="{% url 'parent_dashboard' %}" class="nav-link-item">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-header open" onclick="toggleGroup(this)">
+                <span><i class="bi bi-person-hearts me-2"></i>My Child</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <div class="nav-group-body show">
+                <a href="{% url 'view_result' %}" class="nav-link-item">
+                    <i class="bi bi-card-checklist"></i> Results
+                </a>
+                <a href="{% url 'assignment_list' %}" class="nav-link-item">
+                    <i class="bi bi-clipboard-check"></i> Assignments
+                </a>
+                <a href="{% url 'note_list' %}" class="nav-link-item">
+                    <i class="bi bi-file-earmark-text"></i> Notes
+                </a>
+                <a href="{% url 'video_list' %}" class="nav-link-item">
+                    <i class="bi bi-camera-video"></i> Class Videos
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-header open" onclick="toggleGroup(this)">
+                <span><i class="bi bi-megaphone me-2"></i>School</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <div class="nav-group-body show">
+                <a href="{% url 'announcement_list' %}" class="nav-link-item">
+                    <i class="bi bi-bell"></i> Announcements
+                </a>
+                <a href="#" class="nav-link-item">
+                    <i class="bi bi-cash-stack"></i> Fee Balance
+                    <span class="soon-tag">Soon</span>
+                </a>
+            </div>
+        </div>
+
+    {% elif role == 'student' %}
+
+        <div class="nav-group">
+            <div class="nav-group-header open" onclick="toggleGroup(this)">
+                <span><i class="bi bi-grid me-2"></i>Overview</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <div class="nav-group-body show">
+                <a href="{% url 'student_dashboard' %}" class="nav-link-item">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-header open" onclick="toggleGroup(this)">
+                <span><i class="bi bi-mortarboard me-2"></i>Academics</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <div class="nav-group-body show">
+                <a href="{% url 'view_result' %}" class="nav-link-item">
+                    <i class="bi bi-card-checklist"></i> My Results
+                </a>
+                <a href="{% url 'assignment_list' %}" class="nav-link-item">
+                    <i class="bi bi-clipboard-check"></i> Assignments
+                </a>
+                <a href="{% url 'note_list' %}" class="nav-link-item">
+                    <i class="bi bi-file-earmark-text"></i> Notes
+                </a>
+                <a href="{% url 'video_list' %}" class="nav-link-item">
+                    <i class="bi bi-camera-video"></i> Class Videos
+                <a href="{% url 'learning_games' %}" class="nav-link-item">
+                    <i class="bi bi-controller"></i> Learning Games
+                </a>
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-header open" onclick="toggleGroup(this)">
+                <span><i class="bi bi-megaphone me-2"></i>School</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <div class="nav-group-body show">
+                <a href="{% url 'announcement_list' %}" class="nav-link-item">
+                    <i class="bi bi-bell"></i> Announcements
+                </a>
+            </div>
+        </div>
+
+    {% endif %}
+    {% endwith %}
+</div>
+
+<!-- ══ MAIN CONTENT ════════════════════════════════════════════════════════ -->
+{% if user.is_authenticated %}
+<div class="main-content">
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+{% endif %}
+
+{% block content %}{% endblock %}
+
+{% if user.is_authenticated %}
+</div>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleGroup(header) {
+        header.classList.toggle('open');
+        header.nextElementSibling.classList.toggle('show');
+    }
+
+    document.querySelectorAll('.nav-link-item').forEach(link => {
+        if (link.href === window.location.href) {
+            link.classList.add('active');
+            const body = link.closest('.nav-group-body');
+            if (body) {
+                body.classList.add('show');
+                const header = body.previousElementSibling;
+                if (header) header.classList.add('open');
+            }
+        }
+    });
+</script>
+</body>
+</html>

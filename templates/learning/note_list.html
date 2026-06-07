@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Notes{% endblock %}
+{% block content %}
+<div class="mt-4 px-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold">Lesson Notes</h5>
+        {% if role == 'teacher' or role == 'admin' %}
+        <a href="{% url 'upload_note' %}" class="btn text-white"
+           style="background-color:#1a237e;">+ Upload Note</a>
+        {% endif %}
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+            {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card p-3 mb-3">
+        <form method="GET">
+            <div class="row g-2">
+                {% if role == 'admin' or role == 'teacher' %}
+                <div class="col-md-3">
+                    <select name="class_id" class="form-select form-select-sm">
+                        <option value="">All Classes</option>
+                        {% for c in classes %}
+                        <option value="{{ c.id }}"
+                            {% if selected_class == c.id|stringformat:"s" %}selected{% endif %}>
+                            {{ c.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+                <div class="col-md-3">
+                    <select name="subject_id" class="form-select form-select-sm">
+                        <option value="">All Subjects</option>
+                        {% for s in subjects %}
+                        <option value="{{ s.id }}"
+                            {% if selected_subject == s.id|stringformat:"s" %}selected{% endif %}>
+                            {{ s.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="term_id" class="form-select form-select-sm">
+                        <option value="">All Terms</option>
+                        {% for t in session_terms %}
+                        <option value="{{ t.id }}"
+                            {% if selected_term == t.id|stringformat:"s" %}selected{% endif %}>
+                            {{ t }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-sm text-white w-100"
+                            style="background-color:#1a237e;">Filter</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="row g-3">
+        {% for note in notes %}
+        <div class="col-md-4">
+            <div class="card p-3 h-100">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="badge bg-primary">{{ note.file_extension }}</span>
+                    <small class="text-muted">Week {{ note.week }}</small>
+                </div>
+                <h6 class="fw-bold mb-1">{{ note.topic }}</h6>
+                <p class="text-muted mb-1" style="font-size:0.85rem;">
+                    {{ note.subject.name }} — {{ note.school_class.name }}
+                </p>
+                {% if note.description %}
+                <p style="font-size:0.83rem;" class="text-muted">{{ note.description }}</p>
+                {% endif %}
+                <p style="font-size:0.8rem;" class="text-muted mb-2">
+                    Uploaded: {{ note.uploaded_at|date:"d M Y" }}
+                </p>
+                <div class="d-flex gap-2 mt-auto">
+                    <a href="{{ note.file.url }}" class="btn btn-sm btn-outline-primary"
+                       target="_blank">
+                        <i class="bi bi-download me-1"></i> Download
+                    </a>
+                    {% if role == 'teacher' or role == 'admin' %}
+                    <a href="{% url 'delete_note' note.pk %}"
+                       class="btn btn-sm btn-outline-danger"
+                       onclick="return confirm('Delete this note?')">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">No notes found.</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

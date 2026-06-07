@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;margin:0;padding:20px;}
+  .box{background:white;border-radius:16px;padding:30px;
+       max-width:580px;margin:0 auto;box-shadow:0 4px 20px rgba(0,0,0,0.1);}
+  h2{color:#bf360c;}
+  #q{font-size:1.05rem;font-weight:600;padding:16px;background:#fbe9e7;
+     border-radius:10px;border-left:4px solid #bf360c;margin-bottom:20px;}
+  .opts{display:flex;flex-direction:column;gap:10px;}
+  .opt{padding:13px 18px;border:2px solid #ffab91;border-radius:10px;
+       background:white;cursor:pointer;font-size:0.95rem;text-align:left;transition:all 0.2s;}
+  .opt:hover{background:#fbe9e7;}
+  .opt.correct{background:#c8e6c9;border-color:#2e7d32;color:#1b5e20;}
+  .opt.wrong{background:#ffcdd2;border-color:#c62828;color:#b71c1c;}
+  #sc{color:#757575;margin-top:14px;}
+  #prog{color:#9e9e9e;font-size:0.85rem;margin-bottom:16px;}
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>🇳🇬 States of Nigeria Quiz</h2>
+  <div id="prog"></div>
+  <div id="q"></div>
+  <div class="opts" id="opts"></div>
+  <div id="sc">Score: 0 / 0</div>
+</div>
+<script>
+const qs=[
+  {q:'What is the capital of Lagos State?',o:['Lagos','Ikeja','Badagry','Epe'],a:1},
+  {q:'Which state has Abuja as its Federal Capital Territory?',o:['Niger','Kogi','FCT','Nasarawa'],a:2},
+  {q:'Kano State is in which geopolitical zone?',o:['North Central','South West','North West','North East'],a:2},
+  {q:'What is the capital of Rivers State?',o:['Calabar','Yenagoa','Port Harcourt','Owerri'],a:2},
+  {q:'Which state is known as "The Centre of Excellence"?',o:['Abuja','Lagos','Ogun','Enugu'],a:1},
+  {q:'Ogun State shares a border with which country?',o:['Niger','Benin Republic','Chad','Cameroon'],a:1},
+  {q:'What is the capital of Kaduna State?',o:['Kano','Zaria','Kaduna','Sokoto'],a:2},
+  {q:'Cross River State is in which geopolitical zone?',o:['South West','South East','South South','North Central'],a:2},
+  {q:'What is the capital of Enugu State?',o:['Enugu','Onitsha','Aba','Abakaliki'],a:0},
+  {q:'Which state is the largest by land area in Nigeria?',o:['Niger','Borno','Taraba','Kaduna'],a:1},
+  {q:'What is the capital of Ondo State?',o:['Akure','Ondo','Ile-Ife','Ado-Ekiti'],a:0},
+  {q:'Sokoto State is famous for:',o:['Oil production','Islamic Caliphate history','Coal mining','Cocoa farming'],a:1},
+];
+let idx=0,score=0,total=0;
+function show(){
+  if(idx>=qs.length){
+    document.getElementById('q').textContent='🎉 Quiz Complete! Score: '+score+'/'+total;
+    document.getElementById('opts').innerHTML='';
+    document.getElementById('prog').textContent='';
+    return;
+  }
+  const q=qs[idx];
+  document.getElementById('prog').textContent='Question '+(idx+1)+' of '+qs.length;
+  document.getElementById('q').textContent=q.q;
+  const el=document.getElementById('opts');el.innerHTML='';
+  q.o.forEach((o,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opt';
+    btn.textContent=['A','B','C','D'][i]+'. '+o;
+    btn.onclick=()=>{
+      total++;
+      document.querySelectorAll('.opt').forEach(b=>b.onclick=null);
+      if(i===q.a){score++;btn.classList.add('correct');}
+      else{btn.classList.add('wrong');
+        document.querySelectorAll('.opt')[q.a].classList.add('correct');}
+      document.getElementById('sc').textContent='Score: '+score+' / '+total;
+      idx++;setTimeout(show,1400);
+    };
+    el.appendChild(btn);
+  });
+}
+show();
+</script>
+</body>
+</html>

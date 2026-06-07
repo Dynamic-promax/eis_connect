@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;
+       margin:0;padding:20px;}
+  .box{background:white;border-radius:16px;padding:30px;
+       max-width:600px;margin:0 auto;
+       box-shadow:0 4px 20px rgba(0,0,0,0.1);}
+  h2{color:#1a237e;margin-bottom:20px;}
+  label{font-weight:600;font-size:0.9rem;color:#424242;}
+  input[type=range]{width:100%;margin:8px 0 16px;}
+  #display{font-size:3rem;font-weight:700;color:#1a237e;
+            text-align:center;margin:10px 0;}
+  #decimal{text-align:center;color:#757575;margin-bottom:20px;}
+  canvas{border:2px solid #e0e0e0;border-radius:10px;
+         display:block;margin:0 auto;background:white;}
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>Fraction Visualiser</h2>
+  <label>Numerator: <span id="nVal">1</span></label>
+  <input type="range" id="num" min="1" max="12" value="1" oninput="update()">
+  <label>Denominator: <span id="dVal">4</span></label>
+  <input type="range" id="den" min="1" max="12" value="4" oninput="update()">
+  <div id="display"></div>
+  <div id="decimal"></div>
+  <canvas id="c" width="520" height="180"></canvas>
+</div>
+<script>
+function update(){
+  const n=+document.getElementById('num').value;
+  const d=+document.getElementById('den').value;
+  document.getElementById('nVal').textContent=n;
+  document.getElementById('dVal').textContent=d;
+  document.getElementById('display').innerHTML=
+    '<sup>'+n+'</sup> / <sub>'+d+'</sub>';
+  document.getElementById('decimal').textContent=
+    '= '+(n/d).toFixed(4)+
+    (n%d===0?' (Whole number)':n>d?' (Improper fraction)':'');
+  const c=document.getElementById('c');
+  const ctx=c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+  const cols=Math.min(d,12),rows=Math.ceil(d/cols);
+  const sw=Math.floor((c.width-40)/cols)-6;
+  const sh=Math.floor((c.height-20)/rows)-6;
+  for(let i=0;i<d;i++){
+    const col=i%cols,row=Math.floor(i/cols);
+    const x=20+col*(sw+6),y=10+row*(sh+6);
+    ctx.fillStyle=i<n?'#1a237e':'#e8eaf6';
+    ctx.strokeStyle='#9fa8da';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.roundRect(x,y,sw,sh,6);
+    ctx.fill();ctx.stroke();
+  }
+}
+update();
+</script>
+</body>
+</html>

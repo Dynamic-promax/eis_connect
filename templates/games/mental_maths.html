@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;
+       display:flex;align-items:center;justify-content:center;
+       min-height:100vh;margin:0;}
+  .box{background:white;border-radius:16px;padding:36px;
+       text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.1);
+       max-width:420px;width:90%;}
+  h2{color:#1a237e;}
+  #op{font-size:1rem;color:#757575;margin:10px 0;}
+  #question{font-size:2.2rem;font-weight:700;color:#1a237e;margin:16px 0;}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
+  .opt{background:#e8eaf6;border:2px solid transparent;border-radius:10px;
+       padding:14px;font-size:1.1rem;font-weight:600;cursor:pointer;
+       transition:all 0.2s;color:#1a237e;}
+  .opt:hover{background:#c5cae9;}
+  .opt.correct{background:#c8e6c9;border-color:#2e7d32;color:#2e7d32;}
+  .opt.wrong{background:#ffcdd2;border-color:#c62828;color:#c62828;}
+  #score{margin-top:16px;color:#757575;}
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>Mental Maths Quiz</h2>
+  <div id="op"></div>
+  <div id="question"></div>
+  <div class="opts" id="opts"></div>
+  <div id="score">Score: 0 / 0</div>
+</div>
+<script>
+let score=0,total=0,correct_ans=0;
+const ops=['+','-','×','÷'];
+function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+function newQ(){
+  const op=ops[rand(0,3)];
+  let a,b,ans;
+  if(op==='+'){a=rand(1,50);b=rand(1,50);ans=a+b;}
+  else if(op==='-'){a=rand(10,50);b=rand(1,a);ans=a-b;}
+  else if(op==='×'){a=rand(2,12);b=rand(2,12);ans=a*b;}
+  else{b=rand(2,12);ans=rand(2,12);a=b*ans;}
+  correct_ans=ans;
+  document.getElementById('op').textContent='Operation: '+op;
+  document.getElementById('question').textContent=a+' '+op+' '+b+' = ?';
+  const wrong=[ans+rand(1,5),ans-rand(1,5),ans+rand(6,15),ans*2]
+    .filter(x=>x!==ans&&x>0);
+  const opts=[ans,...wrong.slice(0,3)].sort(()=>Math.random()-0.5);
+  const el=document.getElementById('opts');
+  el.innerHTML='';
+  opts.forEach(o=>{
+    const btn=document.createElement('button');
+    btn.className='opt';
+    btn.textContent=o;
+    btn.onclick=()=>pick(btn,o);
+    el.appendChild(btn);
+  });
+}
+function pick(btn,val){
+  total++;
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=null);
+  if(val===correct_ans){
+    score++;btn.classList.add('correct');
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.opt').forEach(b=>{
+      if(parseInt(b.textContent)===correct_ans)b.classList.add('correct');
+    });
+  }
+  document.getElementById('score').textContent='Score: '+score+' / '+total;
+  setTimeout(newQ,1400);
+}
+newQ();
+</script>
+</body>
+</html>

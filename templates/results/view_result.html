@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block title %}View Result{% endblock %}
+{% block content %}
+<div class="mt-4 px-3">
+    <h5 class="fw-bold mb-3">Student Result</h5>
+
+    <div class="card p-3 mb-4">
+        <form method="GET">
+            <div class="row g-3">
+                {% if children %}
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Select Child</label>
+                    <select name="student_id" class="form-select">
+                        <option value="">Choose child</option>
+                        {% for child in children %}
+                        <option value="{{ child.id }}"
+                            {% if selected_student and selected_student.id == child.id %}selected{% endif %}>
+                            {{ child.get_full_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+
+                {% if students %}
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Select Student</label>
+                    <select name="student_id" class="form-select">
+                        <option value="">Choose student</option>
+                        {% for s in students %}
+                        <option value="{{ s.id }}"
+                            {% if selected_student and selected_student.id == s.id %}selected{% endif %}>
+                            {{ s.get_full_name }} — {{ s.school_class.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Select Term</label>
+                    <select name="term_id" class="form-select">
+                        <option value="">Choose term</option>
+                        {% for term in session_terms %}
+                        <option value="{{ term.id }}"
+                            {% if selected_term and selected_term.id == term.id %}selected{% endif %}>
+                            {{ term }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn text-white w-100" style="background-color:#1a237e;">
+                        View
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% if results %}
+    <div class="card p-4">
+        <div class="text-center mb-3">
+            <h5 class="fw-bold">ESSENCE INTERNATIONAL SCHOOL</h5>
+            <p class="mb-0">Student Result Sheet</p>
+            <p class="text-muted">{{ selected_term }}</p>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p><strong>Name:</strong> {{ selected_student.get_full_name }}</p>
+                <p><strong>Admission No:</strong> {{ selected_student.admission_number }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Class:</strong> {{ selected_student.school_class }}</p>
+                <p><strong>Gender:</strong> {{ selected_student.gender|capfirst }}</p>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead style="background-color:#1a237e; color:white;">
+                    <tr>
+                        <th>Subject</th>
+                        <th>CA (40)</th>
+                        <th>Exam (60)</th>
+                        <th>Total (100)</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr>
+                        <td>{{ result.subject.name }}</td>
+                        <td>{{ result.ca_score }}</td>
+                        <td>{{ result.exam_score }}</td>
+                        <td><strong>{{ result.total_score }}</strong></td>
+                        <td>
+                            <span class="badge
+                                {% if result.grade == 'A' %}bg-success
+                                {% elif result.grade == 'B' %}bg-primary
+                                {% elif result.grade == 'C' %}bg-info text-dark
+                                {% elif result.grade == 'D' %}bg-warning text-dark
+                                {% else %}bg-danger{% endif %}">
+                                {{ result.grade }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="fw-bold">
+                        <td colspan="3">Total Score</td>
+                        <td>
+                            {% with total=0 %}
+                            {% for r in results %}
+                            {% endfor %}
+                            {{ results|length }} subject(s)
+                            {% endwith %}
+                        </td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    {% elif selected_student and selected_term %}
+    <div class="alert alert-warning">
+        No approved results found for {{ selected_student.get_full_name }} in {{ selected_term }}.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

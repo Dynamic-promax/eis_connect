@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Assignments{% endblock %}
+{% block content %}
+<div class="mt-4 px-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold">Assignments</h5>
+        {% if role == 'teacher' or role == 'admin' %}
+        <a href="{% url 'upload_assignment' %}" class="btn text-white"
+           style="background-color:#1a237e;">+ Upload Assignment</a>
+        {% endif %}
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card p-3 mb-3">
+        <form method="GET">
+            <div class="row g-2">
+                {% if role == 'admin' or role == 'teacher' %}
+                <div class="col-md-3">
+                    <select name="class_id" class="form-select form-select-sm">
+                        <option value="">All Classes</option>
+                        {% for c in classes %}
+                        <option value="{{ c.id }}"
+                            {% if selected_class == c.id|stringformat:"s" %}selected{% endif %}>
+                            {{ c.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+                <div class="col-md-3">
+                    <select name="term_id" class="form-select form-select-sm">
+                        <option value="">All Terms</option>
+                        {% for t in session_terms %}
+                        <option value="{{ t.id }}"
+                            {% if selected_term == t.id|stringformat:"s" %}selected{% endif %}>
+                            {{ t }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-sm text-white w-100"
+                            style="background-color:#1a237e;">Filter</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="row g-3">
+        {% for assignment in assignments %}
+        <div class="col-md-4">
+            <div class="card p-3 h-100">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="badge bg-warning text-dark">{{ assignment.subject.name }}</span>
+                    {% if assignment.is_overdue %}
+                    <span class="badge bg-danger">Overdue</span>
+                    {% else %}
+                    <span class="badge bg-success">Open</span>
+                    {% endif %}
+                </div>
+                <h6 class="fw-bold mb-1">{{ assignment.title }}</h6>
+                <p class="text-muted mb-1" style="font-size:0.85rem;">
+                    {{ assignment.school_class.name }}
+                </p>
+                <p style="font-size:0.83rem;" class="text-muted mb-1">
+                    <i class="bi bi-calendar-event me-1"></i>
+                    Deadline: {{ assignment.deadline|date:"d M Y, g:i A" }}
+                </p>
+                <div class="d-flex gap-2 mt-auto pt-2">
+                    <a href="{% url 'assignment_detail' assignment.pk %}"
+                       class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-eye me-1"></i> View
+                    </a>
+                    {% if role == 'teacher' or role == 'admin' %}
+                    <a href="{% url 'view_submissions' assignment.pk %}"
+                       class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-people me-1"></i> Submissions
+                    </a>
+                    <a href="{% url 'delete_assignment' assignment.pk %}"
+                       class="btn btn-sm btn-outline-danger"
+                       onclick="return confirm('Delete this assignment?')">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">No assignments found.</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block title %}Grade Submission{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-7">
+
+        <div class="card p-4 mb-3">
+            <h5 class="fw-bold mb-1">Grade Submission</h5>
+            <p class="text-muted mb-0">
+                {{ submission.assignment.title }} —
+                {{ submission.assignment.subject.name }}
+            </p>
+        </div>
+
+        <div class="card p-4 mb-3">
+            <h6 class="fw-bold mb-3">
+                Student: {{ submission.student.get_full_name }}
+                <small class="text-muted">({{ submission.student.admission_number }})</small>
+            </h6>
+
+            {% if submission.text_answer %}
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Written Answer</label>
+                <div class="border rounded p-3" style="background:#f8f9fa; white-space:pre-wrap;">
+                    {{ submission.text_answer }}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if submission.file %}
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Submitted File</label><br>
+                <a href="{{ submission.file.url }}" target="_blank"
+                   class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-download me-1"></i> Download Submission
+                </a>
+            </div>
+            {% endif %}
+
+            <p class="text-muted mb-0" style="font-size:0.85rem;">
+                Submitted: {{ submission.submitted_at|date:"d M Y, g:i A" }}
+            </p>
+        </div>
+
+        <div class="card p-4">
+            <h6 class="fw-bold mb-3">
+                {% if submission.is_graded %}Edit Grade{% else %}Enter Grade{% endif %}
+            </h6>
+
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            {% if submission.is_graded %}
+            <div class="alert alert-info">
+                Current Grade: <strong>{{ submission.grade }}</strong> —
+                Score: <strong>{{ submission.score }}/100</strong><br>
+                Graded on {{ submission.graded_at|date:"d M Y, g:i A" }}
+            </div>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Score (out of 100)</label>
+                        <input type="number" name="score" class="form-control"
+                               min="0" max="100" step="0.5"
+                               value="{{ submission.score|default:'' }}"
+                               placeholder="e.g. 75" required>
+                        <small class="text-muted">
+                            70–100 = A | 60–69 = B | 50–59 = C |
+                            45–49 = D | 40–44 = E | Below 40 = F
+                        </small>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Teacher Remark</label>
+                        <textarea name="teacher_remark" class="form-control" rows="3"
+                                  placeholder="e.g. Good work but needs improvement in structure...">{{ submission.teacher_remark }}</textarea>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn text-white px-4"
+                                style="background-color:#1a237e;">
+                            {% if submission.is_graded %}Update Grade{% else %}Submit Grade{% endif %}
+                        </button>
+                        <a href="{% url 'view_submissions' submission.assignment.pk %}"
+                           class="btn btn-outline-secondary ms-2">Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

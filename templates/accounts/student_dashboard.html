@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Student Dashboard{% endblock %}
+{% block content %}
+
+<h5 class="fw-bold mb-1">Student Dashboard</h5>
+<p class="text-muted mb-4">Welcome back, {{ user.get_full_name }}</p>
+
+{% if student %}
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="label">Admission Number</div>
+            <div class="fw-bold mt-1">{{ student.admission_number }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="label">Class</div>
+            <div class="fw-bold mt-1">{{ student.school_class }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="label">Gender</div>
+            <div class="fw-bold mt-1">{{ student.gender|capfirst }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card p-3">
+    <h6 class="fw-bold mb-3">Quick Actions</h6>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'view_result' %}" class="btn btn-outline-primary">
+            <i class="bi bi-card-checklist me-1"></i> View My Results
+        </a>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-warning">Your student profile is not linked. Contact the school admin.</div>
+{% endif %}
+
+{% if recent_announcements %}
+<div class="card p-3 mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="fw-bold mb-0">Recent Announcements</h6>
+        <a href="{% url 'announcement_list' %}" class="btn btn-sm btn-outline-primary">
+            View All
+        </a>
+    </div>
+    {% for ann in recent_announcements %}
+    <div class="border-bottom py-2">
+        <div class="d-flex justify-content-between">
+            <span class="fw-semibold">{{ ann.title }}</span>
+            <small class="text-muted">{{ ann.created_at|date:"d M Y" }}</small>
+        </div>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">
+            {{ ann.message|truncatechars:100 }}
+        </p>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

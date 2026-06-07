@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% block title %}Learning Games{% endblock %}
+{% block content %}
+
+<h5 class="fw-bold mb-1">Learning Games & Simulations</h5>
+<p class="text-muted mb-4">Interactive tools to make learning fun and engaging.</p>
+
+<!-- MATHEMATICS -->
+<h6 class="fw-bold mb-3" style="color:var(--eis-blue);">
+    <i class="bi bi-calculator me-2"></i>Mathematics
+</h6>
+<div class="row g-3 mb-4">
+
+    <div class="col-md-4">
+        <div class="card p-3 h-100">
+            <div style="font-size:2rem; margin-bottom:8px;">➕</div>
+            <h6 class="fw-bold">Times Table Challenge</h6>
+            <p class="text-muted" style="font-size:0.83rem;">Test your multiplication speed. Race against the clock.</p>
+            <button class="btn btn-sm text-white mt-auto" style="background-color:#1a237e;"
+                    onclick="openGame('times_table')">Play Now</button>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3 h-100">
+            <div style="font-size:2rem; margin-bottom:8px;">🔢</div>
+            <h6 class="fw-bold">Fraction Visualiser</h6>
+            <p class="text-muted" style="font-size:0.83rem;">Visualise and understand fractions interactively.</p>
+            <button class="btn btn-sm text-white mt-auto" style="background-color:#1a237e;"
+                    onclick="openGame('fractions')">Play Now</button>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3 h-100">
+            <div style="font-size:2rem; margin-bottom:8px;">🧮</div>
+            <h6 class="fw-bold">Mental Maths Quiz</h6>
+            <p class="text-muted" style="font-size:0.83rem;">Addition, subtraction, multiplication and division.</p>
+            <button class="btn btn-sm text-white mt-auto" style="background-color:#1a237e;"
+                    onclick="openGame('mental_maths')">Play Now</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- SCIENCE -->
+<h6 class="fw-bold mb-3" style="color:#2e7d32;">
+    <i class="bi bi-flask me-2"></i>Science
+</h6>
+<div class="row g-3 mb-4">
+
+    <div class="col-md-4">
+        <div class="card p-3 h-100">
+            <div style="font-size:2rem; margin-bottom:8px;">🧬</div>
+            <h6 class="fw-bold">Human Body Quiz</h6>
+            <p class="text-muted" style="font-size:0.83rem;">Label organs and answer questions about the human body.</p>
+            <button class="btn btn-sm text-white mt-auto" style="background:#2e7d32;"
+                    onclick="openGame('human_body')">Play Now</button>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3 h-100">
+            <div style="font-size:2rem; margin-bottom:8px;">⚗️</div>
+            <h6 class="fw-bold">Chemistry Elements Quiz</h6>
+            <p class="text-muted" style="font-size:0.83rem;">Test your knowledge of elements and their symbols.</p>
+            <button class="btn btn-sm text-white mt-auto" style="background:#2e7d32;"
+                    onclick="openGame('chemistry')">Play Now</button>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3 h-100">
+            <div style="font-size:2rem; margin-bottom:8px;">🌍</div>
+            <h6 class="fw-bold">Solar System Explorer</h6>
+            <p class="text-muted" style="font-size:0.83rem;">Explore planets and facts about our solar system.</p>
+            <button class="btn btn-sm text-white mt-auto" style="background:#2e7d32;"
+                    onclick="openGame('solar_system')">Play Now</button>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3 h-100">
+            <div style="font-size:2rem; margin-bottom:8px;">⚡</div>
+            <h6 class="fw-bold">Physics — Forces Quiz</h6>
+            <p class="text-muted" style="font-size:0.83rem;">Gravity, friction, motion and Newton's laws.</p>
+            <button class="btn btn-sm text-white mt-auto" style="background:#2e7d32;"
+                    onclick="openGame('physics')">Play Now</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ENGLISH -->
+<h6 class="fw-bold mb-3" style="color:#6a1b9a;">
+    <i class="bi bi-alphabet me-2"></i>English Language
+</h6>
+<div class="row g-3 mb-4">
+
+    <div class="col-md-4">
+        <div class="card p-3 h-100">
+            <div style="font-size:2rem; margin-bottom:8px;">📝</div>
+            <h6 class="fw-bold">Spelling Bee</h6>
+            <p class="text-muted" style="font-size:0.83rem;">Spell the word correctly and score points.</p>
+            <button class="btn btn-sm text-white mt-auto" style="background:#6a1b9a;"
+                    onclick="openGame('spelling_bee')">Play Now</button>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3 h-100">
+            <div style="font-size:2rem; margin-bottom:8px;">📖</div>
+            <h6 class="fw-bold">Grammar Quiz</h6>
+            <p class="text-muted" style="font-size:0.83rem;">Parts of speech, tenses, punctuation and more.</p>
+            <button class="btn btn-sm text-white mt-auto" style="background:#6a1b9a;"
+                    onclick="openGame('grammar')">Play Now</button>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3 h-100">
+            <div style="font-size:2rem; margin-bottom:8px;">🔤</div>
+            <h6 class="fw-bold">Vocabulary Builder</h6>
+            <p class="text-muted" style="font-size:0.83rem;">Match words to their correct meanings.</p>
+            <button class="btn btn-sm text-white mt-auto" style="background:#6a1b9a;"
+                    onclick="openGame('vocabulary')">Play Now</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- GEOGRAPHY -->
+<h6 class="fw-bold mb-3" style="color:#bf360c;">
+    <i class="bi bi-globe me-2"></i>Geography
+</h6>
+<div class="row g-3 mb-4">
+
+    <div class="col-md-4">
+        <div class="card p-3 h-100">
+            <div style="font-size:2rem; margin-bottom:8px;">🇳🇬</div>
+            <h6 class="fw-bold">States of Nigeria Quiz</h6>
+            <p class="text-muted" style="font-size:0.83rem;">Name Nigerian states, capitals and geopolitical zones.</p>
+            <button class="btn btn-sm text-white mt-auto" style="background:#bf360c;"
+                    onclick="openGame('nigeria')">Play Now</button>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3 h-100">
+            <div style="font-size:2rem; margin-bottom:8px;">🗺️</div>
+            <h6 class="fw-bold">African Countries Quiz</h6>
+            <p class="text-muted" style="font-size:0.83rem;">Identify African countries and their capitals.</p>
+            <button class="btn btn-sm text-white mt-auto" style="background:#bf360c;"
+                    onclick="openGame('africa')">Play Now</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- GAME MODAL -->
+<div class="modal fade" id="gameModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content" style="background:var(--surface); border:1px solid var(--border);">
+            <div class="modal-header" style="border-color:var(--border);">
+                <h5 class="modal-title fw-bold" id="gameModalTitle">Game</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        onclick="stopGame()"></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="gameFrame"
+                        style="width:100%; height:520px; border:none;"
+                        allow="scripts">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openGame(key) {
+    const titles = {
+        times_table: 'Times Table Challenge',
+        fractions:   'Fraction Visualiser',
+        mental_maths:'Mental Maths Quiz',
+        human_body:  'Human Body Quiz',
+        chemistry:   'Chemistry Elements Quiz',
+        solar_system:'Solar System Explorer',
+        physics:     'Physics — Forces Quiz',
+        spelling_bee:'Spelling Bee',
+        grammar:     'Grammar Quiz',
+        vocabulary:  'Vocabulary Builder',
+        nigeria:     'States of Nigeria Quiz',
+        africa:      'African Countries Quiz',
+    };
+
+    document.getElementById('gameModalTitle').textContent = titles[key] || 'Game';
+
+    // fetch the game page and put it in srcdoc
+    fetch('/games/' + key.replace(/_/g, '-') + '/')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('gameFrame').srcdoc = html;
+        })
+        .catch(() => {
+            document.getElementById('gameFrame').srcdoc =
+                '<p style="padding:20px;color:red;">Failed to load game.</p>';
+        });
+
+    new bootstrap.Modal(document.getElementById('gameModal')).show();
+}
+
+function stopGame() {
+    document.getElementById('gameFrame').srcdoc = '';
+    document.getElementById('gameFrame').src = '';
+}
+
+document.getElementById('gameModal').addEventListener('hidden.bs.modal', stopGame);
+</script>
+
+{% endblock %}

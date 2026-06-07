@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;margin:0;padding:20px;}
+  .box{background:white;border-radius:16px;padding:30px;
+       max-width:560px;margin:0 auto;box-shadow:0 4px 20px rgba(0,0,0,0.1);}
+  h2{color:#2e7d32;}
+  #q{font-size:1.05rem;font-weight:600;padding:16px;background:#e8f5e9;
+     border-radius:10px;border-left:4px solid #2e7d32;margin-bottom:20px;}
+  .opts{display:flex;flex-direction:column;gap:10px;}
+  .opt{padding:13px 18px;border:2px solid #a5d6a7;border-radius:10px;
+       background:white;cursor:pointer;font-size:0.95rem;text-align:left;transition:all 0.2s;}
+  .opt:hover{background:#e8f5e9;}
+  .opt.correct{background:#c8e6c9;border-color:#2e7d32;color:#1b5e20;}
+  .opt.wrong{background:#ffcdd2;border-color:#c62828;color:#b71c1c;}
+  #sc{color:#757575;margin-top:14px;}
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>Human Body Quiz</h2>
+  <div id="q"></div>
+  <div class="opts" id="opts"></div>
+  <div id="sc">Score: 0 / 0</div>
+</div>
+<script>
+const qs=[
+  {q:'Which organ pumps blood around the body?',o:['Lungs','Kidney','Heart','Brain'],a:2},
+  {q:'Where does most digestion happen?',o:['Stomach','Small intestine','Liver','Large intestine'],a:1},
+  {q:'What is the largest organ in the human body?',o:['Heart','Liver','Skin','Lungs'],a:2},
+  {q:'Which part of the body controls all actions?',o:['Heart','Lungs','Stomach','Brain'],a:3},
+  {q:'How many bones does an adult human body have?',o:['106','206','306','406'],a:1},
+  {q:'What do the lungs do?',o:['Pump blood','Filter waste','Exchange oxygen and CO2','Digest food'],a:2},
+  {q:'The kidneys filter which liquid?',o:['Blood','Saliva','Sweat','Bile'],a:0},
+  {q:'What carries oxygen in the blood?',o:['White blood cells','Platelets','Red blood cells','Plasma'],a:2},
+  {q:'Which organ produces insulin?',o:['Liver','Kidney','Pancreas','Stomach'],a:2},
+  {q:'The femur is a bone in the:',o:['Arm','Leg','Back','Skull'],a:1},
+];
+let idx=0,score=0,total=0;
+function show(){
+  if(idx>=qs.length){idx=0;}
+  const q=qs[idx];
+  document.getElementById('q').textContent='Q'+(idx+1)+': '+q.q;
+  const el=document.getElementById('opts');
+  el.innerHTML='';
+  q.o.forEach((o,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opt';
+    btn.textContent=['A','B','C','D'][i]+'. '+o;
+    btn.onclick=()=>{
+      total++;
+      document.querySelectorAll('.opt').forEach(b=>b.onclick=null);
+      if(i===q.a){score++;btn.classList.add('correct');}
+      else{btn.classList.add('wrong');
+           document.querySelectorAll('.opt')[q.a].classList.add('correct');}
+      document.getElementById('sc').textContent='Score: '+score+' / '+total;
+      idx++;setTimeout(show,1400);
+    };
+    el.appendChild(btn);
+  });
+}
+show();
+</script>
+</body>
+</html>

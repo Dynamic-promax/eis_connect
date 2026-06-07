@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}{{ video.title }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-2">
+    <div class="col-md-9">
+        <div class="card p-0 overflow-hidden">
+
+            <!-- VIDEO PLAYER -->
+            <div style="background:#000; width:100%;">
+
+                {% if video.is_file %}
+                <!-- Uploaded video file -->
+                <video controls style="width:100%; max-height:500px; display:block;">
+                    <source src="{{ video.video_file.url }}">
+                    Your browser does not support the video tag.
+                </video>
+
+                {% elif embed_url %}
+                <!-- YouTube or embeddable URL -->
+                <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden;">
+                    <iframe src="{{ embed_url }}"
+                            style="position:absolute; top:0; left:0; width:100%; height:100%;"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write;
+                                   encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                    </iframe>
+                </div>
+
+                {% elif video.video_url %}
+                <!-- Other URL — open in new tab -->
+                <div style="padding:60px; text-align:center;">
+                    <i class="bi bi-play-circle text-white" style="font-size:4rem;"></i>
+                    <p class="text-white mt-3">This video opens in an external player.</p>
+                    <a href="{{ video.video_url }}" target="_blank"
+                       class="btn btn-lg text-white mt-2"
+                       style="background-color:#1a237e;">
+                        <i class="bi bi-box-arrow-up-right me-2"></i> Open Video
+                    </a>
+                </div>
+
+                {% else %}
+                <div style="padding:60px; text-align:center;">
+                    <p class="text-white">No video source found.</p>
+                </div>
+                {% endif %}
+
+            </div>
+
+            <!-- VIDEO INFO -->
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h5 class="fw-bold mb-1">{{ video.title }}</h5>
+                        <p class="text-muted mb-0" style="font-size:0.88rem;">
+                            {{ video.subject.name }} —
+                            {{ video.school_class.name }}
+                            &nbsp;·&nbsp; Week {{ video.week }}
+                        </p>
+                    </div>
+                    <span class="badge bg-primary">{{ video.subject.name }}</span>
+                </div>
+
+                {% if video.description %}
+                <p class="mb-3">{{ video.description }}</p>
+                {% endif %}
+
+                <div class="d-flex gap-4 flex-wrap mb-4"
+                     style="font-size:0.85rem; color:var(--text-muted);">
+                    <span>
+                        <i class="bi bi-person me-1"></i>
+                        {{ video.teacher.user.get_full_name }}
+                    </span>
+                    <span>
+                        <i class="bi bi-calendar me-1"></i>
+                        {{ video.uploaded_at|date:"d M Y" }}
+                    </span>
+                    <span>
+                        <i class="bi bi-book me-1"></i>
+                        {{ video.session_term }}
+                    </span>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a href="{% url 'video_list' %}"
+                       class="btn btn-outline-secondary btn-sm">
+                        ← Back to Videos
+                    </a>
+                    {% if role == 'teacher' or role == 'admin' %}
+                    <a href="{% url 'delete_video' video.pk %}"
+                       class="btn btn-outline-danger btn-sm"
+                       onclick="return confirm('Delete this video?')">
+                        <i class="bi bi-trash me-1"></i> Delete
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Class Result Sheet{% endblock %}
+{% block content %}
+<div class="mt-4 px-3">
+    <h5 class="fw-bold mb-3">Class Result Sheet</h5>
+
+    <div class="card p-3 mb-4">
+        <form method="GET">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Select Class</label>
+                    <select name="class_id" class="form-select">
+                        <option value="">Choose class</option>
+                        {% for c in classes %}
+                        <option value="{{ c.id }}"
+                            {% if selected_class and selected_class.id == c.id %}selected{% endif %}>
+                            {{ c.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Select Term</label>
+                    <select name="term_id" class="form-select">
+                        <option value="">Choose term</option>
+                        {% for term in session_terms %}
+                        <option value="{{ term.id }}"
+                            {% if selected_term and selected_term.id == term.id %}selected{% endif %}>
+                            {{ term }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn text-white w-100" style="background-color:#1a237e;">
+                        Load
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% if students_results %}
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-bordered mb-0">
+                <thead style="background-color:#1a237e; color:white;">
+                    <tr>
+                        <th>Student</th>
+                        <th>Adm. No.</th>
+                        <th>Subjects Scored</th>
+                        <th>Total Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in students_results %}
+                    <tr>
+                        <td>{{ entry.student.get_full_name }}</td>
+                        <td>{{ entry.student.admission_number }}</td>
+                        <td>{{ entry.count }}</td>
+                        <td><strong>{{ entry.total }}</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

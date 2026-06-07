@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}Post Announcement{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-7">
+        <div class="card p-4">
+            <h5 class="fw-bold mb-1">Post Announcement</h5>
+            <p class="text-muted mb-4">
+                Choose your audience carefully. Pinned announcements appear at the top.
+            </p>
+
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-danger">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Title</label>
+                        <input type="text" name="title" class="form-control"
+                               placeholder="e.g. End of Term Examination Timetable" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Target Audience</label>
+                        <select name="target" class="form-select" required>
+                            <option value="all">Everyone</option>
+                            <option value="teachers">Teachers Only</option>
+                            <option value="parents">Parents Only</option>
+                            <option value="students">Students Only</option>
+                            <option value="parents_students">Parents and Students</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox"
+                                   name="is_pinned" id="is_pinned">
+                            <label class="form-check-label fw-semibold" for="is_pinned">
+                                Pin this announcement
+                            </label>
+                            <div class="text-muted" style="font-size:0.82rem;">
+                                Pinned announcements stay at the top.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Message</label>
+                        <textarea name="message" class="form-control" rows="6"
+                                  placeholder="Write the full announcement here..."
+                                  required></textarea>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn text-white px-4"
+                                style="background-color:#1a237e;">
+                            <i class="bi bi-megaphone me-1"></i> Post Announcement
+                        </button>
+                        <a href="{% url 'announcement_list' %}"
+                           class="btn btn-outline-secondary ms-2">Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

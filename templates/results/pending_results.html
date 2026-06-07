@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Pending Results{% endblock %}
+{% block content %}
+<div class="mt-4 px-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold">Pending Results</h5>
+        <form method="POST" action="{% url 'approve_class_results' %}">
+            {% csrf_token %}
+            <div class="d-flex gap-2">
+                <select name="class_id" class="form-select form-select-sm">
+                    <option value="">Select class</option>
+                    {% for c in classes %}
+                    <option value="{{ c.id }}">{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+                <input type="hidden" name="session_term_id"
+                    value="{% for r in results %}{{ r.session_term.id }}{% if forloop.first %}{% endif %}{% endfor %}">
+                <button type="submit" class="btn btn-success btn-sm">Approve All</button>
+            </div>
+        </form>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead style="background-color:#1a237e; color:white;">
+                    <tr>
+                        <th>Student</th>
+                        <th>Class</th>
+                        <th>Subject</th>
+                        <th>CA</th>
+                        <th>Exam</th>
+                        <th>Total</th>
+                        <th>Grade</th>
+                        <th>Teacher</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr>
+                        <td>{{ result.student.get_full_name }}</td>
+                        <td>{{ result.school_class.name }}</td>
+                        <td>{{ result.subject.name }}</td>
+                        <td>{{ result.ca_score }}</td>
+                        <td>{{ result.exam_score }}</td>
+                        <td><strong>{{ result.total_score }}</strong></td>
+                        <td>
+                            <span class="badge
+                                {% if result.grade == 'A' %}bg-success
+                                {% elif result.grade == 'B' %}bg-primary
+                                {% elif result.grade == 'C' %}bg-info
+                                {% elif result.grade == 'D' %}bg-warning
+                                {% else %}bg-danger{% endif %}">
+                                {{ result.grade }}
+                            </span>
+                        </td>
+                        <td>{{ result.teacher }}</td>
+                        <td>
+                            <a href="{% url 'approve_result' result.pk %}"
+                               class="btn btn-sm btn-success">Approve</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-4">No pending results.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

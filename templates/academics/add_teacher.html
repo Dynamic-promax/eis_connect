@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Add Teacher{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-7">
+        <div class="card p-4">
+            <h5 class="fw-bold mb-1">Add New Teacher</h5>
+            <p class="text-muted mb-4">
+                The teacher's phone number will be their login username.
+                They will set their own password on first login.
+            </p>
+
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-danger">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Full Name</label>
+                        <input type="text" name="full_name" class="form-control"
+                               placeholder="e.g. Mr John Bello" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Phone Number (Login Username)</label>
+                        <input type="text" name="phone" class="form-control"
+                               placeholder="e.g. 08012345678" required>
+                        <small class="text-muted">This will be the teacher's login username.</small>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-semibold">Email (optional)</label>
+                        <input type="email" name="email" class="form-control"
+                               placeholder="e.g. teacher@school.com">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Assign Subjects</label>
+                        <div class="border rounded p-3" style="max-height:220px; overflow-y:auto;">
+                            {% for subject in subjects %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                       name="subjects" value="{{ subject.id }}"
+                                       id="subj_{{ subject.id }}">
+                                <label class="form-check-label" for="subj_{{ subject.id }}">
+                                    {{ subject.name }} — {{ subject.school_class.name }}
+                                </label>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted mb-0">No subjects found. Add subjects first.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn text-white px-4"
+                                style="background-color:#1a237e;">
+                            Create Teacher Account
+                        </button>
+                        <a href="{% url 'teacher_list' %}"
+                           class="btn btn-outline-secondary ms-2">Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

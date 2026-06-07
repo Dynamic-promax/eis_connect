@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body{font-family:'Segoe UI',sans-serif;background:#0a0a1a;margin:0;padding:20px;color:white;}
+  .box{max-width:620px;margin:0 auto;}
+  h2{color:#ffd600;text-align:center;}
+  .planets{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+  .planet{background:#1a1d27;border:2px solid #2a2d3a;border-radius:12px;
+          padding:14px;text-align:center;cursor:pointer;transition:all 0.2s;}
+  .planet:hover{border-color:#ffd600;background:#1e2235;}
+  .planet .icon{font-size:2rem;margin-bottom:6px;}
+  .planet .name{font-size:0.85rem;font-weight:600;color:#90caf9;}
+  #info{background:#1a1d27;border:2px solid #ffd600;border-radius:12px;
+        padding:20px;display:none;}
+  #info h3{color:#ffd600;margin-bottom:10px;}
+  #info p{color:#bdbdbd;font-size:0.9rem;line-height:1.6;}
+  #close{background:#ffd600;color:#0a0a1a;border:none;padding:8px 20px;
+         border-radius:8px;cursor:pointer;font-weight:700;margin-top:12px;}
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>🌌 Solar System Explorer</h2>
+  <p style="text-align:center;color:#9e9e9e;margin-bottom:20px;">
+    Click any planet to learn about it
+  </p>
+  <div class="planets" id="planets"></div>
+  <div id="info">
+    <h3 id="pName"></h3>
+    <p id="pInfo"></p>
+    <button id="close" onclick="document.getElementById('info').style.display='none'">
+      Close
+    </button>
+  </div>
+</div>
+<script>
+const planets=[
+  {name:'Mercury',icon:'⚫',info:'The smallest planet and closest to the Sun. A year on Mercury is only 88 Earth days. Temperatures range from -180°C at night to 430°C during the day. It has no moons.'},
+  {name:'Venus',icon:'🟡',info:'The hottest planet in our solar system at 465°C due to its thick atmosphere. It rotates backwards compared to most planets. A day on Venus is longer than its year.'},
+  {name:'Earth',icon:'🌍',info:'Our home planet. The only known planet with life. It has one moon and is perfectly positioned in the "habitable zone". 71% of Earth\'s surface is covered in water.'},
+  {name:'Mars',icon:'🔴',info:'The Red Planet. Has the tallest volcano in the solar system — Olympus Mons. Mars has two small moons — Phobos and Deimos. Scientists are exploring it with rovers.'},
+  {name:'Jupiter',icon:'🟠',info:'The largest planet — so big that 1,300 Earths could fit inside it. It has a giant storm called the Great Red Spot that has lasted over 350 years. Jupiter has 95 known moons.'},
+  {name:'Saturn',icon:'🪐',info:'Known for its beautiful ring system made of ice and rock. Saturn is the least dense planet — it could float on water. It has 146 known moons including Titan.'},
+  {name:'Uranus',icon:'🔵',info:'An ice giant that rotates on its side — its axis is tilted 98°. It has 13 rings and 27 known moons. Uranus appears blue-green due to methane in its atmosphere.'},
+  {name:'Neptune',icon:'💙',info:'The farthest planet from the Sun. It has the strongest winds in the solar system at 2,100 km/h. Neptune has 16 moons — the largest is Triton. A year on Neptune = 165 Earth years.'},
+];
+const el=document.getElementById('planets');
+planets.forEach(p=>{
+  const div=document.createElement('div');
+  div.className='planet';
+  div.innerHTML='<div class="icon">'+p.icon+'</div><div class="name">'+p.name+'</div>';
+  div.onclick=()=>{
+    document.getElementById('pName').textContent=p.icon+' '+p.name;
+    document.getElementById('pInfo').textContent=p.info;
+    document.getElementById('info').style.display='block';
+    document.getElementById('info').scrollIntoView({behavior:'smooth'});
+  };
+  el.appendChild(div);
+});
+</script>
+</body>
+</html>

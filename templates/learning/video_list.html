@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% block title %}Class Videos{% endblock %}
+{% block content %}
+<div class="mt-2">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h5 class="fw-bold mb-0">Class Videos</h5>
+            <p class="text-muted mb-0" style="font-size:0.85rem;">
+                Recorded lessons and educational videos
+            </p>
+        </div>
+        {% if role == 'teacher' or role == 'admin' %}
+        <a href="{% url 'upload_video' %}" class="btn text-white"
+           style="background-color:#1a237e;">
+            <i class="bi bi-camera-video me-1"></i> Upload Video
+        </a>
+        {% endif %}
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card p-3 mb-4">
+        <form method="GET">
+            <div class="row g-2">
+                {% if role == 'admin' or role == 'teacher' %}
+                <div class="col-md-3">
+                    <select name="class_id" class="form-select form-select-sm">
+                        <option value="">All Classes</option>
+                        {% for c in classes %}
+                        <option value="{{ c.id }}"
+                            {% if selected_class == c.id|stringformat:"s" %}selected{% endif %}>
+                            {{ c.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+                <div class="col-md-3">
+                    <select name="term_id" class="form-select form-select-sm">
+                        <option value="">All Terms</option>
+                        {% for t in session_terms %}
+                        <option value="{{ t.id }}"
+                            {% if selected_term == t.id|stringformat:"s" %}selected{% endif %}>
+                            {{ t }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-sm text-white w-100"
+                            style="background-color:#1a237e;">Filter</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="row g-3">
+        {% for video in videos %}
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div style="background:#0d1433; height:160px; display:flex;
+                            align-items:center; justify-content:center;
+                            border-radius:12px 12px 0 0; position:relative; overflow:hidden;">
+                    {% if video.is_url %}
+                        {% if 'youtube' in video.video_url or 'youtu.be' in video.video_url %}
+                        <img src="https://img.youtube.com/vi/{{ video.video_url|slice:'32:' }}/0.jpg"
+                             style="width:100%; height:100%; object-fit:cover; opacity:0.6;"
+                             onerror="this.style.display='none'">
+                        {% endif %}
+                    {% endif %}
+                    <div style="position:absolute; text-align:center;">
+                        <i class="bi bi-play-circle-fill text-white"
+                           style="font-size:3rem; opacity:0.9;"></i>
+                    </div>
+                </div>
+                <div class="p-3">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <span class="badge bg-primary" style="font-size:0.7rem;">
+                            {{ video.subject.name }}
+                        </span>
+                        <small class="text-muted">Week {{ video.week }}</small>
+                    </div>
+                    <h6 class="fw-bold mb-1">{{ video.title }}</h6>
+                    <p class="text-muted mb-2" style="font-size:0.82rem;">
+                        {{ video.school_class.name }}
+                    </p>
+                    {% if video.description %}
+                    <p class="text-muted mb-2" style="font-size:0.8rem;">
+                        {{ video.description|truncatechars:60 }}
+                    </p>
+                    {% endif %}
+                    <p class="text-muted mb-3" style="font-size:0.78rem;">
+                        <i class="bi bi-person me-1"></i>
+                        {{ video.teacher.user.get_full_name }}
+                        &nbsp;·&nbsp;
+                        {{ video.uploaded_at|date:"d M Y" }}
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'video_detail' video.pk %}"
+                           class="btn btn-sm text-white flex-grow-1"
+                           style="background-color:#1a237e;">
+                            <i class="bi bi-play-fill me-1"></i> Watch
+                        </a>
+                        {% if role == 'teacher' or role == 'admin' %}
+                        <a href="{% url 'delete_video' video.pk %}"
+                           class="btn btn-sm btn-outline-danger"
+                           onclick="return confirm('Delete this video?')">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">No videos found.</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;
+       display:flex;align-items:center;justify-content:center;
+       min-height:100vh;margin:0;}
+  .box{background:white;border-radius:16px;padding:36px;
+       text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.1);
+       max-width:420px;width:90%;}
+  h2{color:#6a1b9a;}
+  #word{font-size:2.2rem;font-weight:700;color:#6a1b9a;
+        letter-spacing:6px;margin:20px 0;}
+  #hint{color:#9e9e9e;font-size:0.9rem;margin-bottom:16px;}
+  input{font-size:1.2rem;padding:10px 16px;width:80%;
+        text-align:center;border:2px solid #6a1b9a;
+        border-radius:10px;outline:none;}
+  .btns{display:flex;gap:10px;margin-top:14px;}
+  button{flex:1;padding:12px;border:none;border-radius:10px;
+         font-size:1rem;cursor:pointer;font-weight:600;}
+  .check{background:#6a1b9a;color:white;}
+  .skip{background:#e0e0e0;color:#424242;}
+  #fb{margin-top:14px;font-size:1.1rem;font-weight:600;min-height:28px;}
+  #sc{color:#757575;margin-top:8px;}
+  .c{color:#2e7d32;}.w{color:#c62828;}
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>Spelling Bee</h2>
+  <div id="word"></div>
+  <div id="hint"></div>
+  <input type="text" id="inp" placeholder="Type the word" autofocus
+         onkeydown="if(event.key==='Enter')check()">
+  <div class="btns">
+    <button class="check" onclick="check()">Check</button>
+    <button class="skip" onclick="next()">Skip</button>
+  </div>
+  <div id="fb"></div>
+  <div id="sc">Score: 0</div>
+</div>
+<script>
+const words=[
+  {w:'beautiful',h:'Something nice to look at'},
+  {w:'necessary',h:'Something you must have'},
+  {w:'government',h:'People who lead a country'},
+  {w:'environment',h:'Our natural surroundings'},
+  {w:'mathematics',h:'The subject of numbers'},
+  {w:'dictionary',h:'A book of word meanings'},
+  {w:'knowledge',h:'What you learn and know'},
+  {w:'electricity',h:'Power that lights our homes'},
+  {w:'examination',h:'A test at school'},
+  {w:'agriculture',h:'Farming and growing crops'},
+  {w:'independent',h:'Standing on your own'},
+  {w:'celebration',h:'A party or happy event'},
+  {w:'communication',h:'Sharing information'},
+  {w:'temperature',h:'How hot or cold something is'},
+  {w:'parliament',h:'Where laws are made'},
+  {w:'geography',h:'Study of the earth'},
+  {w:'photosynthesis',h:'How plants make food'},
+  {w:'constitution',h:'Laws of a country'},
+  {w:'precipitation',h:'Rain, snow or hail'},
+  {w:'multiplication',h:'A maths operation'},
+];
+let idx=0,score=0;
+function shuffle(a){return a.sort(()=>Math.random()-0.5);}
+const shuffled=shuffle([...words]);
+function show(){
+  if(idx>=shuffled.length){idx=0;shuffle(shuffled);}
+  const e=shuffled[idx];
+  const m=e.w.split('').map((c,i)=>
+    i===0||i===e.w.length-1?c:'_').join(' ');
+  document.getElementById('word').textContent=m;
+  document.getElementById('hint').textContent='Hint: '+e.h;
+  document.getElementById('inp').value='';
+  document.getElementById('fb').textContent='';
+  document.getElementById('inp').focus();
+}
+function check(){
+  const v=document.getElementById('inp').value.trim().toLowerCase();
+  if(v===shuffled[idx].w){
+    score++;
+    document.getElementById('fb').innerHTML='<span class="c">✓ Correct!</span>';
+    document.getElementById('sc').textContent='Score: '+score;
+    idx++;setTimeout(show,1000);
+  } else {
+    document.getElementById('fb').innerHTML=
+      '<span class="w">✗ Wrong! Correct: '+shuffled[idx].w+'</span>';
+    idx++;setTimeout(show,1600);
+  }
+}
+function next(){idx++;show();}
+show();
+</script>
+</body>
+</html>

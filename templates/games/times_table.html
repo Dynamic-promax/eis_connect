@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family:'Segoe UI',sans-serif; background:#f0f2f5;
+         display:flex; align-items:center; justify-content:center;
+         min-height:100vh; margin:0; }
+  .box { background:white; border-radius:16px; padding:40px;
+         text-align:center; box-shadow:0 4px 20px rgba(0,0,0,0.1);
+         max-width:400px; width:90%; }
+  h2 { color:#1a237e; margin-bottom:8px; }
+  #question { font-size:2.5rem; font-weight:700; color:#1a237e;
+              margin:20px 0; }
+  input { font-size:1.5rem; padding:10px 16px; width:160px;
+          text-align:center; border:2px solid #1a237e;
+          border-radius:10px; outline:none; }
+  button { background:#1a237e; color:white; border:none;
+           padding:12px 32px; border-radius:10px; font-size:1rem;
+           cursor:pointer; margin-top:12px; display:block;
+           width:100%; transition:background 0.2s; }
+  button:hover { background:#283593; }
+  #feedback { margin-top:14px; font-size:1.1rem; font-weight:600;
+              min-height:28px; }
+  #score { color:#757575; margin-top:8px; }
+  .correct { color:#2e7d32; }
+  .wrong { color:#c62828; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>Times Table Challenge</h2>
+  <p style="color:#757575;">Answer as fast as you can!</p>
+  <div id="question"></div>
+  <input type="number" id="ans" placeholder="?" autofocus
+         onkeydown="if(event.key==='Enter')check()">
+  <button onclick="check()">Submit Answer</button>
+  <div id="feedback"></div>
+  <div id="score">Score: 0 &nbsp;|&nbsp; Streak: 0</div>
+</div>
+<script>
+let a,b,score=0,streak=0;
+function newQ(){
+  a=Math.ceil(Math.random()*12);
+  b=Math.ceil(Math.random()*12);
+  document.getElementById('question').textContent=a+' × '+b+' = ?';
+  document.getElementById('ans').value='';
+  document.getElementById('feedback').textContent='';
+  document.getElementById('ans').focus();
+}
+function check(){
+  const v=parseInt(document.getElementById('ans').value);
+  const fb=document.getElementById('feedback');
+  if(v===a*b){
+    score++;streak++;
+    fb.innerHTML='<span class="correct">✓ Correct! Well done!</span>';
+  } else {
+    streak=0;
+    fb.innerHTML='<span class="wrong">✗ Wrong! Answer: '+(a*b)+'</span>';
+  }
+  document.getElementById('score').textContent=
+    'Score: '+score+' | Streak: '+streak;
+  setTimeout(newQ,1200);
+}
+newQ();
+</script>
+</body>
+</html>

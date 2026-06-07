@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Teacher Dashboard{% endblock %}
+{% block content %}
+
+<h5 class="fw-bold mb-1">Teacher Dashboard</h5>
+<p class="text-muted mb-4">Welcome back, {{ user.get_full_name }}</p>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="label">My Subjects</div>
+            <div class="number">{{ total_subjects }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="label">Results Submitted</div>
+            <div class="number">{{ results_submitted }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="border-left-color:#e53935;">
+            <div class="label">Pending Approval</div>
+            <div class="number" style="color:#e53935;">{{ results_pending }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="border-left-color:#2e7d32;">
+            <div class="label">Approved Results</div>
+            <div class="number" style="color:#2e7d32;">{{ results_approved }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6 class="fw-bold mb-3">Quick Actions</h6>
+            <div class="d-flex flex-column gap-2">
+                <a href="{% url 'upload_result' %}" class="btn btn-outline-primary text-start">
+                    <i class="bi bi-upload me-2"></i> Upload Student Scores
+                </a>
+                <a href="{% url 'view_result' %}" class="btn btn-outline-success text-start">
+                    <i class="bi bi-card-checklist me-2"></i> View Results
+                </a>
+                <a href="{% url 'student_list' %}" class="btn btn-outline-secondary text-start">
+                    <i class="bi bi-people me-2"></i> View Students
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6 class="fw-bold mb-3">My Assigned Subjects</h6>
+            {% for subject in assigned_subjects %}
+            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                <span>{{ subject.name }}</span>
+                <span class="badge bg-light text-dark">{{ subject.school_class.name }}</span>
+            </div>
+            {% empty %}
+            <p class="text-muted">No subjects assigned yet.</p>
+            {% endfor %}
+
+            {% if recent_announcements %}
+            <div class="card p-3 mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0">Recent Announcements</h6>
+                    <a href="{% url 'announcement_list' %}" class="btn btn-sm btn-outline-primary">
+                        View All
+                    </a>
+                </div>
+                {% for ann in recent_announcements %}
+                <div class="border-bottom py-2">
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-semibold">{{ ann.title }}</span>
+                        <small class="text-muted">{{ ann.created_at|date:"d M Y" }}</small>
+                    </div>
+                    <p class="text-muted mb-0" style="font-size:0.85rem;">
+                        {{ ann.message|truncatechars:100 }}
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
