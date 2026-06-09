@@ -168,3 +168,7 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     X_FRAME_OPTIONS = 'SAMEORIGIN'
     SECURE_CONTENT_TYPE_NOSNIFF = True
+    
+import os
+
+NVIDIA_API_KEY = os.environ.get("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", "")

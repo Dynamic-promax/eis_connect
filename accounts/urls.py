@@ -13,4 +13,6 @@ urlpatterns = [
     path('dashboard/parent/', views.parent_dashboard, name='parent_dashboard'),
     path('dashboard/student/', views.student_dashboard, name='student_dashboard'),
     path('learning-games/', views.learning_games, name='learning_games'),
+    path('ai-tutor/', views.ai_tutor, name='ai_tutor'),
+    path('ai-tutor/ask/', views.ai_tutor_ask, name='ai_tutor_ask'),
 ]

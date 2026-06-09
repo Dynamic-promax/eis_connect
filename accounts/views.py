@@ -10,6 +10,12 @@ from django.utils import timezone
 from .models import UserProfile
 from communication.models import Announcement
 
+def get_role(user):
+    try:
+        return user.profile.role
+    except Exception:
+        return None
+
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -315,3 +321,133 @@ def create_password_view(request):
 @login_required
 def learning_games(request):
     return render(request, 'accounts/learning_games.html')
+
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+
+
+@login_required
+def ai_tutor(request):
+    role = get_role(request.user)
+    student = None
+    children = []
+
+    if role == 'student':
+        try:
+            student = request.user.student_profile
+        except Exception:
+            pass
+    elif role == 'parent':
+        try:
+            parent = request.user.parent_profile
+            children = parent.children.select_related('school_class').all()
+        except Exception:
+            pass
+
+    return render(request, 'accounts/ai_tutor.html', {
+        'student': student,
+        'children': children,
+        'role': role,
+    })
+
+
+@login_required
+def ai_tutor_ask(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        question = data.get('question', '').strip()
+        conversation_history = data.get('history', [])
+        subject = data.get('subject', 'General')
+        student_class = data.get('student_class', '')
+    except Exception:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+    if not question:
+        return JsonResponse({'error': 'Question cannot be empty'}, status=400)
+
+    if len(question) > 1000:
+        return JsonResponse({'error': 'Question too long'}, status=400)
+
+    # build system prompt
+    system_prompt = f"""You are EIS Tutor, a friendly and patient AI teacher for Essence International School in Kaduna, Nigeria. 
+
+Your role is to help students understand school subjects clearly and simply.
+
+Student Information:
+- Class: {student_class if student_class else 'Not specified'}
+- Subject focus: {subject if subject else 'General'}
+
+Guidelines:
+- Explain concepts in simple, clear language appropriate for Nigerian secondary school students
+- Use Nigerian examples and context where relevant (e.g. Naira for maths, Nigerian geography, Nigerian history)
+- Break down complex topics into easy steps
+- Encourage the student when they ask good questions
+- If a student makes a mistake in their question, gently correct it
+- For maths problems, show working step by step
+- For English, give examples from everyday Nigerian life
+- Keep responses focused and not too long — students learn better with clear concise explanations
+- End responses with a follow-up question or encouragement to keep the student engaged
+- Never do homework for students directly — guide them to the answer instead
+- You are not a general chatbot — only help with school subjects and learning
+
+Always respond in English."""
+
+    # build messages for API
+    messages = []
+    for msg in conversation_history[-10:]:  # keep last 10 messages for context
+        if msg.get('role') in ['user', 'assistant']:
+            messages.append({
+                'role': msg['role'],
+                'content': msg['content']
+            })
+
+    messages.append({
+        'role': 'user',
+        'content': question
+    })
+
+    try:
+        from openai import OpenAI
+
+        client = OpenAI(
+            base_url="https://integrate.api.nvidia.com/v1",
+            api_key=settings.NVIDIA_API_KEY,
+        )
+
+        response = client.chat.completions.create(
+            model="deepseek-ai/deepseek-v4-pro",
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_prompt,
+                },
+                *messages
+            ],
+            temperature=0.4,
+            top_p=0.95,
+            max_tokens=4096,
+            extra_body={
+                "chat_template_kwargs": {
+                    "thinking": False
+                }
+            },
+            stream=False,
+        )
+
+        answer = response.choices[0].message.content
+
+        return JsonResponse({
+            "answer": answer,
+            "status": "success"
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            "error": str(e),
+            "status": "error"
+        }, status=500)
