@@ -415,7 +415,7 @@ Always respond in English."""
         from openai import OpenAI
 
         client = OpenAI(
-            base_url="https://integrate.api.nvidia.com/v1",
+            base_url="dotapi.nvidia.com",
             api_key=settings.NVIDIA_API_KEY,
         )
 

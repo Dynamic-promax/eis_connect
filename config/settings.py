@@ -170,5 +170,4 @@ if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     
 import os
-
-NVIDIA_API_KEY = os.environ.get("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", "")
+NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "")
