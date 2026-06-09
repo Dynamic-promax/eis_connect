@@ -1,14 +1,18 @@
 import base64
 import random
 import string
+import json
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.utils import timezone
+from django.http import JsonResponse
+from django.conf import settings
 from .models import UserProfile
 from communication.models import Announcement
+
 
 def get_role(user):
     try:
@@ -25,7 +29,6 @@ def login_view(request):
         username = request.POST.get('username').strip()
         password = request.POST.get('password')
 
-        # check if this is a first-time user with no password set
         try:
             user_obj = User.objects.get(username=username)
             if not user_obj.has_usable_password():
@@ -119,10 +122,12 @@ def forgot_password_view(request):
             try:
                 user = User.objects.get(username=username)
                 if not user.has_usable_password():
-                    messages.error(request, 'This account has not set a password yet. Use the login page to set one.')
+                    messages.error(
+                        request,
+                        'This account has not set a password yet. Use the login page to set one.'
+                    )
                     return render(request, 'accounts/forgot_password.html', {'step': 1})
 
-                # generate 6-digit PIN
                 pin = ''.join(random.choices(string.digits, k=6))
                 user.profile.reset_pin = pin
                 user.profile.reset_pin_created = timezone.now()
@@ -131,7 +136,6 @@ def forgot_password_view(request):
                 request.session['forgot_username'] = username
                 request.session['forgot_step'] = 2
 
-                # show pin on screen since school has no email/SMS yet
                 messages.success(
                     request,
                     f'Your reset PIN is: {pin} — Enter it below. '
@@ -189,93 +193,6 @@ def forgot_password_view(request):
 
     return render(request, 'accounts/forgot_password.html', {'step': step})
 
-def toggle_dark_mode(request):
-    current = request.session.get('dark_mode', False)
-    request.session['dark_mode'] = not current
-    next_url = request.META.get('HTTP_REFERER', '/')
-    return redirect(next_url)
-
-@login_required
-def admin_dashboard(request):
-    from academics.models import Student, Teacher, SchoolClass
-    from results.models import Result, SessionTerm
-
-    context = {
-    'total_students': Student.objects.count(),
-    'total_teachers': Teacher.objects.count(),
-    'total_classes': SchoolClass.objects.count(),
-    'pending_results': Result.objects.filter(status='pending').count(),
-    'active_term': SessionTerm.objects.filter(is_active=True).first(),
-    'recent_announcements': Announcement.objects.all()[:3],
-    }
-    return render(request, 'accounts/admin_dashboard.html', context)
-
-
-@login_required
-def teacher_dashboard(request):
-    from academics.models import Teacher
-    from results.models import Result
-
-    try:
-        teacher = request.user.teacher_profile
-        assigned_subjects = teacher.subjects.select_related('school_class').all()
-        results_submitted = Result.objects.filter(teacher=teacher).count()
-        results_pending = Result.objects.filter(teacher=teacher, status='pending').count()
-        results_approved = Result.objects.filter(teacher=teacher, status='approved').count()
-    except Exception:
-        assigned_subjects = []
-        results_submitted = 0
-        results_pending = 0
-        results_approved = 0
-
-    context = {
-        'assigned_subjects': assigned_subjects,
-        'total_subjects': len(list(assigned_subjects)),
-        'results_submitted': results_submitted,
-        'results_pending': results_pending,
-        'results_approved': results_approved,
-        'recent_announcements': Announcement.objects.filter(
-            target__in=['all', 'teachers']
-        )[:3],
-    }
-    return render(request, 'accounts/teacher_dashboard.html', context)
-
-
-@login_required
-def parent_dashboard(request):
-    children = []
-    try:
-        parent = request.user.parent_profile
-        children = parent.children.select_related('school_class').all()
-    except Exception:
-        pass
-    
-    context = {
-        'children': children,
-        'recent_announcements': Announcement.objects.filter(
-            target__in=['all', 'parents', 'parents_students']
-        )[:3],
-    }
-
-    return render(request, 'accounts/parent_dashboard.html', {'children': children})
-
-
-@login_required
-def student_dashboard(request):
-    student = None
-    try:
-        student = request.user.student_profile
-    except Exception:
-        pass
-    
-    context = {
-        'student': student,
-        'recent_announcements': Announcement.objects.filter(
-            target__in=['all', 'students', 'parents_students']
-        )[:3],
-    }   
-
-    return render(request, 'accounts/student_dashboard.html', {'student': student})
 
 def create_password_view(request):
     if request.method == 'POST':
@@ -318,14 +235,98 @@ def create_password_view(request):
 
     return render(request, 'accounts/create_password.html')
 
+
+def toggle_dark_mode(request):
+    current = request.session.get('dark_mode', False)
+    request.session['dark_mode'] = not current
+    next_url = request.META.get('HTTP_REFERER', '/')
+    return redirect(next_url)
+
+
+@login_required
+def admin_dashboard(request):
+    from academics.models import Student, Teacher, SchoolClass
+    from results.models import Result, SessionTerm
+
+    context = {
+        'total_students': Student.objects.count(),
+        'total_teachers': Teacher.objects.count(),
+        'total_classes': SchoolClass.objects.count(),
+        'pending_results': Result.objects.filter(status='pending').count(),
+        'active_term': SessionTerm.objects.filter(is_active=True).first(),
+        'recent_announcements': Announcement.objects.all()[:3],
+    }
+    return render(request, 'accounts/admin_dashboard.html', context)
+
+
+@login_required
+def teacher_dashboard(request):
+    from academics.models import Teacher
+    from results.models import Result
+
+    try:
+        teacher = request.user.teacher_profile
+        assigned_subjects = teacher.subjects.select_related('school_class').all()
+        results_submitted = Result.objects.filter(teacher=teacher).count()
+        results_pending = Result.objects.filter(teacher=teacher, status='pending').count()
+        results_approved = Result.objects.filter(teacher=teacher, status='approved').count()
+    except Exception:
+        assigned_subjects = []
+        results_submitted = 0
+        results_pending = 0
+        results_approved = 0
+
+    context = {
+        'assigned_subjects': assigned_subjects,
+        'total_subjects': len(list(assigned_subjects)),
+        'results_submitted': results_submitted,
+        'results_pending': results_pending,
+        'results_approved': results_approved,
+        'recent_announcements': Announcement.objects.filter(
+            target__in=['all', 'teachers']
+        )[:3],
+    }
+    return render(request, 'accounts/teacher_dashboard.html', context)
+
+
+@login_required
+def parent_dashboard(request):
+    children = []
+    try:
+        parent = request.user.parent_profile
+        children = parent.children.select_related('school_class').all()
+    except Exception:
+        pass
+
+    context = {
+        'children': children,
+        'recent_announcements': Announcement.objects.filter(
+            target__in=['all', 'parents', 'parents_students']
+        )[:3],
+    }
+    return render(request, 'accounts/parent_dashboard.html', context)
+
+
+@login_required
+def student_dashboard(request):
+    student = None
+    try:
+        student = request.user.student_profile
+    except Exception:
+        pass
+
+    context = {
+        'student': student,
+        'recent_announcements': Announcement.objects.filter(
+            target__in=['all', 'students', 'parents_students']
+        )[:3],
+    }
+    return render(request, 'accounts/student_dashboard.html', context)
+
+
 @login_required
 def learning_games(request):
     return render(request, 'accounts/learning_games.html')
-
-import json
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
 
 
 @login_required
@@ -373,8 +374,7 @@ def ai_tutor_ask(request):
     if len(question) > 1000:
         return JsonResponse({'error': 'Question too long'}, status=400)
 
-    # build system prompt
-    system_prompt = f"""You are EIS Tutor, a friendly and patient AI teacher for Essence International School in Kaduna, Nigeria. 
+    system_prompt = f"""You are EIS Tutor, a friendly and patient AI teacher for Essence International School in Kaduna, Nigeria.
 
 Your role is to help students understand school subjects clearly and simply.
 
@@ -390,23 +390,24 @@ Guidelines:
 - If a student makes a mistake in their question, gently correct it
 - For maths problems, show working step by step
 - For English, give examples from everyday Nigerian life
-- Keep responses focused and not too long — students learn better with clear concise explanations
-- End responses with a follow-up question or encouragement to keep the student engaged
+- Keep responses focused and not too long
+- End responses with a follow-up question or encouragement
 - Never do homework for students directly — guide them to the answer instead
-- You are not a general chatbot — only help with school subjects and learning
+- Only help with school subjects and learning
 
 Always respond in English."""
 
-    # build messages for API
-    messages = []
-    for msg in conversation_history[-10:]:  # keep last 10 messages for context
+    # use a different variable name to avoid conflict with django messages module
+    chat_messages = [{"role": "system", "content": system_prompt}]
+
+    for msg in conversation_history[-10:]:
         if msg.get('role') in ['user', 'assistant']:
-            messages.append({
+            chat_messages.append({
                 'role': msg['role'],
                 'content': msg['content']
             })
 
-    messages.append({
+    chat_messages.append({
         'role': 'user',
         'content': question
     })
@@ -414,40 +415,37 @@ Always respond in English."""
     try:
         from openai import OpenAI
 
+        api_key = settings.NVIDIA_API_KEY
+        if not api_key:
+            return JsonResponse({
+                'error': 'AI Tutor is not configured yet. NVIDIA API key is missing.',
+                'status': 'error'
+            }, status=500)
+
         client = OpenAI(
-            base_url="dotapi.nvidia.com",
-            api_key=settings.NVIDIA_API_KEY,
+            base_url='https://integrate.api.nvidia.com/v1',
+            api_key=api_key,
         )
 
-        response = client.chat.completions.create(
-            model="deepseek-ai/deepseek-v4-pro",
-            messages=[
-                {
-                    "role": "system",
-                    "content": system_prompt,
-                },
-                *messages
-            ],
-            temperature=0.4,
+        completion = client.chat.completions.create(
+            model='deepseek-ai/deepseek-v4-pro',
+            messages=chat_messages,
+            temperature=0.7,
             top_p=0.95,
-            max_tokens=4096,
-            extra_body={
-                "chat_template_kwargs": {
-                    "thinking": False
-                }
-            },
+            max_tokens=1024,
+            extra_body={"chat_template_kwargs": {"thinking": False}},
             stream=False,
         )
 
-        answer = response.choices[0].message.content
+        answer = completion.choices[0].message.content
 
         return JsonResponse({
-            "answer": answer,
-            "status": "success"
+            'answer': answer,
+            'status': 'success'
         })
 
     except Exception as e:
         return JsonResponse({
-            "error": str(e),
-            "status": "error"
+            'error': str(e),
+            'status': 'error'
         }, status=500)
